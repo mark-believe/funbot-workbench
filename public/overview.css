@@ -1,0 +1,45 @@
+#tab-stats{font-variant-numeric:tabular-nums}
+body[data-view="stats"] main.workspace{padding-top:12px;max-width:1570px}
+#tab-stats .desk-title{margin:2px 0 10px}
+#tab-stats .desk-title h1{font-size:26px}
+#tab-stats .metric-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:10px}
+#tab-stats button.metric{padding:10px 14px;gap:3px;border-radius:8px}
+#tab-stats .metric strong{font-size:26px}
+#tab-stats .paper{padding:12px 15px;margin:0;border-radius:9px;min-width:0}
+.match-grid,.reward-grid{display:grid;gap:10px;margin:0 0 10px;grid-template-columns:minmax(0,2fr) minmax(240px,1fr)}
+.match-table{width:100%;table-layout:auto;border-collapse:collapse}
+.match-table :is(td,th),#tab-stats .account-grid :is(th,td){padding:5px 9px;font-size:14px;line-height:1.4;white-space:nowrap}
+.match-table th,.match-table td{text-align:right}
+.match-table th:first-child{text-align:left}
+.match-table tfoot{background:#dfebe4;font-weight:700}
+.group-link{border:0;background:none;color:#0b6450;padding:2px 0;font-size:14px;font-weight:650}
+.group-link:hover{text-decoration:underline}
+.wins-cell{color:#12634c;font-weight:700}
+.date-filter{display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap}
+.date-filter input{width:auto;padding:4px 6px;font-size:14px}
+.match-note{margin:6px 0 0;color:#596c62;font-size:12px}
+#match-week{overflow-x:auto}
+.week-table{width:100%;table-layout:auto;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.week-table :is(td,th){font-size:13px;padding:5px 3px;line-height:1.5;text-align:center;white-space:nowrap}
+.week-table .group-link{font-size:13px;padding:0}.active-day th{box-shadow:inset 3px 0 #317b63}
+.match-grid{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+#tab-stats .account-report{margin-bottom:10px}
+.account-report .table-scroll{max-height:clamp(300px,53vh,650px);overflow:auto}
+#tab-stats .account-grid{table-layout:auto}
+.account-report th{position:sticky;top:0;background:#edf2ef;z-index:2}
+.account-report .account-grid small{display:inline;margin-left:8px;color:#65756f}
+.account-report .detail td{white-space:normal!important}
+#tab-stats .chart-head{margin-bottom:4px}
+#tab-stats .chart-head h2,#tab-stats .paper h2{font-size:17px;margin:0}
+#tab-stats .filters{margin:6px 0}
+.reward-grid .ring-wrap{min-height:94px}.reward-grid .ring{width:84px}
+@media(max-width:850px){.match-grid,.reward-grid{grid-template-columns:minmax(0,1fr)}#tab-stats .metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.account-report .account-grid small{display:block;margin:0}}
+@media(max-width:520px){#tab-stats .metric-grid{gap:5px}#tab-stats button.metric{padding:7px!important}#tab-stats .metric strong{font-size:20px}#tab-stats .metric span{font-size:12px}#tab-stats .paper{padding:10px}.match-table :is(th,td){font-size:12px;padding:5px}.date-filter{font-size:12px}.date-filter input{max-width:133px}.account-report .table-scroll thead th{font-size:12px}}
+#tab-stats .group-link,#tab-stats .account-link{min-height:24px;height:auto;line-height:1.35;padding:1px 3px}
+#tab-stats .date-filter input{min-height:32px;height:32px}
+#tab-stats .filters :is(input,select){min-height:34px;height:34px;padding:4px 8px}
+#tab-stats .match-table :is(td,th),#tab-stats .week-table :is(td,th){padding-top:3px;padding-bottom:3px}
+#tab-stats .expansion-report{margin:0 0 10px}
+.expansion-report details,.expansion-report #ex-note{font-size:13px;line-height:1.6;margin:5px 0;color:#435d53}
+.book-tools{display:flex;gap:5px}.book-tools button{font-size:13px;padding:5px 9px;min-height:30px;line-height:1.3}
+.expansion-report tbody tr td.ex-ready{color:#125e42;font-weight:700;background:#e4f2e9}

@@ -1,0 +1,63 @@
+/* Daily workspaces share one flexible content column; logs sit below on narrow screens. */
+body{--ink:#1b3332;--accent:#126356;--line-soft:#d6ded9;color:var(--ink);background:#f4f6f4}
+.bar,main.workspace{max-width:1520px}
+.bar .tabs{background:#f0f4f1;border-radius:10px;padding:3px}
+.bar .tab{font-weight:600}
+#daily-fuze{border-left:4px solid #236c59;scroll-margin-top:6rem}
+.daily-panel .chart-head h2{margin:0}
+.read-mode{background:#e4f1e9;color:#1e6147;border-radius:5px;padding:4px 9px;font-size:13px}
+#df-status,#df-scope,#df-ledger{font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.daily-metrics,.asset-grid{display:grid;gap:14px}
+.daily-metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin:18px 0}
+.daily-metrics>div{padding-left:12px;border-left:2px solid #ccdbd2;color:#53675f;font-size:13px}
+.daily-metrics strong{display:block;font-size:clamp(16px,1.55vw,22px);color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.daily-panel details,.advanced{border:0;background:#f4f7f4;border-radius:8px;padding:9px 12px}
+.daily-panel summary,.advanced summary{font-size:14px;color:#35594b;cursor:pointer}
+.asset-grid{grid-template-columns:1fr 1fr}
+.asset-grid .paper{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px;min-height:168px}
+.asset-grid p{font-size:15px;line-height:1.55;margin:0 0 12px}
+.asset-grid button{margin-top:auto}
+.asset-feature{background:#12443d;color:#fff;border-color:#12443d}
+.asset-feature h2,.asset-feature p{color:#fff}
+#setupBody{display:grid;grid-template-columns:165px minmax(0,1fr);align-items:start;gap:0 18px}
+#setupBody[hidden]{display:none}
+#setupBody>.settings-nav{display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:8px;margin:0;grid-column:1;grid-row:1 / span 3}
+.settings-nav button{background:transparent;border:0;text-align:left;font-size:15px;padding:10px 12px}
+.settings-nav button[aria-pressed=true]{background:#dcece3;color:#185542;font-weight:700}
+#setupBody>section{grid-column:2;min-width:0;margin:0 0 12px;border:1px solid var(--line-soft);padding:18px;border-radius:12px;background:#fff}
+#setupBody:not([data-pane="contract"])>#desk-contract,#setupBody:not([data-pane="accounts"])>:is(#desk-accounts,#secPrep),#setupBody:not([data-pane="game"])>#desk-game,#setupBody:not([data-pane="derive"])>#secDerive{display:none}
+#tab-setup>#secUnlock{max-width:560px;border:1px solid var(--line-soft);padding:20px;border-radius:12px;background:#fff}
+#secUnlock input{width:100%;box-sizing:border-box}
+#tab-setup>details{padding:12px 16px}
+#tab-setup :is(input:not([type=checkbox]),select){max-width:100%}
+#tab-setup .ops button,#tab-play .ops button,#tab-assets button{flex:0 1 auto;width:auto;font-size:15px;line-height:1.45;padding:8px 14px;min-height:38px}
+#tab-play .hero{padding:20px;background:#fff;color:var(--ink);border:1px solid var(--line-soft);box-shadow:none}
+#tab-play .hero-t{font-size:20px;color:var(--ink);margin:0 0 16px}
+#tab-play .advanced{margin-top:14px}#tab-play .picked{gap:8px;font-size:14px}
+#tab-play .picked input[type=number]{width:65px}
+#tab-play .stats{gap:8px}#tab-play .stat{min-width:0;padding:12px}
+#tab-play .wrap,#seatWrap{max-height:65vh;overflow:auto;overscroll-behavior:contain}
+#playToSetup{margin-bottom:16px}
+@media(max-width:780px){
+ .daily-metrics,.asset-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .asset-grid{grid-template-columns:1fr}
+ .asset-grid .paper{min-height:0;margin:0}.asset-grid{margin-bottom:14px}
+ #setupBody{display:block}#setupBody>.settings-nav{display:grid;grid-template-columns:1fr 1fr;position:static;margin-bottom:10px}
+ #tab-play .hero,#setupBody>section{padding:12px}
+ #tab-play .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #tab-play .row,#tab-play .picked{flex-wrap:wrap}
+}
+
+.bar .unlock-entry{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;margin-left:4px;padding:9px 17px;border:1px solid #145346;border-radius:8px;background:#125a49;color:#fff;font-size:15px;font-weight:700;line-height:1.4;min-height:42px}
+.bar .unlock-entry:hover,.bar .unlock-entry:focus-visible{background:#093f34;outline:2px solid #d5ae68;outline-offset:2px}
+.bar .unlock-entry[hidden],.bar #lockState[hidden]{display:none}
+#tab-setup>#secUnlock{max-width:600px;padding:clamp(16px,3vw,28px);border-top:4px solid #1f775f}
+#secUnlock:focus-within{box-shadow:0 0 0 2px #bfd9cc}
+#secUnlock #pw{font-size:16px;padding:11px 13px;line-height:1.5}
+#secUnlock .ops{margin:12px 0 0}
+@media(max-width:760px){.bar .brand{order:0;margin-right:auto}.bar .unlock-entry{order:1;margin:0}.bar #block{display:none}.bar #busy{order:2}.bar .tabs{order:3;width:100%;margin:0}.bar{row-gap:6px}}
+/* Give the 11-column roster the full row before switching accounts to cards. */
+@media (min-width:1051px) and (max-width:1350px) {
+  body[data-view="play"] main.workspace {grid-template-columns:minmax(0,1fr)}
+  body[data-view="play"] .console {position:static}
+}
