@@ -6,16 +6,16 @@
     <meta name="color-scheme" content="light" />
     <title>共建工作台 · 武林大会</title>
     <link rel="icon" href="data:," />
-    <link rel="stylesheet" href="app.css" /><link rel="stylesheet" href="desk.css" /><link rel="stylesheet" href="workbench.css" /><link rel="stylesheet" href="overview.css" />
+    <link rel="stylesheet" href="app.css" /><link rel="stylesheet" href="desk.css" /><link rel="stylesheet" href="workbench.css" /><link rel="stylesheet" href="overview.css" /><link rel="stylesheet" href="mark-ai.css" />
   </head>
   <body>
     <header>
       <div class="bar">
-        <strong class="brand">共建工作台</strong><div class="tabs" aria-label="工作区">
-          <button class="tab on" data-tab="stats">统计总览</button>
-          <button class="tab" data-tab="play">日常打局</button>
-          <button class="tab" data-tab="assets">令牌操作</button>
-          <button class="tab" data-tab="setup">账号设置</button>
+        <div class="brand-lockup"><img class="brand-mark" src="mark-ai-symbol-dark.svg" alt="MARK·AI" /><div><strong class="brand">共建工作台</strong><small>MARK·AI / LOCAL OPERATOR</small></div></div><div class="tabs" aria-label="工作区">
+          <button class="tab on" data-tab="stats">总览</button>
+          <button class="tab" data-tab="play">执行</button>
+          <button class="tab" data-tab="assets">令牌</button>
+          <button class="tab" data-tab="setup">账号与合约</button>
         </div>
         <span id="systemIdentity" class="chip">本地系统</span>
         <span id="net" class="chip">—</span>
@@ -28,7 +28,9 @@
 
     <main class="workspace">
       <div class="workspace-content">
+ <section class="launchpad" aria-label="开始使用共建工作台"><div class="launchpad-copy"><p class="launchpad-eyebrow">MARK·AI LAB / COMMUNITY TOOL</p><h1>看清进度，<em>再开始下一步。</em></h1><p>从账号准备到批量执行，把需要核对的状态和操作集中在一个本地工作台。</p><div class="launchpad-actions"><button type="button" class="go" data-tab-target="setup">设置账号与合约 <span aria-hidden="true">↗</span></button><button type="button" data-tab-target="play">进入执行台 <span aria-hidden="true">→</span></button></div></div><ol class="launchpad-steps" aria-label="开始操作的三个步骤"><li><span>01 / 准备</span><strong>导入并解锁</strong><small>密钥只在本机终端输入</small></li><li><span>02 / 连接</span><strong>载入 Squad 合约</strong><small>核对地址、网络与名册</small></li><li><span>03 / 执行</span><strong>预览后开跑</strong><small>关注余额、局数与回执</small></li></ol></section>
         <div id="tab-stats">
+
  <div class="desk-title"><div><h1>共建总览</h1><p id="ds-status" role="status">正在读取链上数据…</p></div><button id="ds-refresh">刷新统计</button></div>
  <div id="ds-cards" class="metric-grid"></div>
  <div class="match-grid"><section class="paper group-report"><div class="chart-head"><h2>分组战绩</h2><label class="date-filter">比赛日 <input type="date" id="match-date"></label></div>
@@ -564,6 +566,6 @@
       </form>
     </dialog>
     <div id="copyNotice" class="copy-notice" role="status" aria-live="polite" hidden></div>
-    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script>
+    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="mark-ai.js"></script>
   </body>
 </html>
