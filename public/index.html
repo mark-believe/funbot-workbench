@@ -18,8 +18,6 @@
           <button class="tab" data-tab="setup">账号与合约</button>
         </div>
         <label class="environment-picker"><span>环境</span><select id="environment" aria-label="工作台环境"><option value="live">真实环境</option><option value="demo">测试数据</option></select></label>
-        <button type="button" id="vipOpen" class="vip-launch" aria-haspopup="dialog">社区 VIP</button>
-        <button type="button" data-modal="roadmapDialog" aria-haspopup="dialog">研发路线图</button>
         <span id="systemIdentity" class="chip">本地系统</span>
         <span id="net" class="chip">—</span>
         <span id="lockState" class="chip" role="status">连接中</span>
@@ -576,43 +574,6 @@
     </main>
     <dialog id="stageDialog" class="operator-modal" aria-labelledby="stageTitle"><div class="modal-head"><h2 id="stageTitle">账户变动</h2><button data-close-modal>关闭</button></div><p id="stageSummary"></p><div id="stageContents" class="modal-scroll"></div></dialog>
     <dialog id="collectionDialog" class="operator-modal" aria-labelledby="collectionTitle"><div class="modal-head"><h2 id="collectionTitle">核对归集清单</h2><button data-close-modal>关闭</button></div><p id="collectionStatus" role="status"></p><div id="collectionRows" class="modal-scroll"></div><button id="collectionConfirm" class="daily-action" hidden>确认归集清单</button></dialog>
-    <dialog id="vipDialog" class="operator-modal" aria-labelledby="vipTitle">
-      <div class="modal-head"><h2 id="vipTitle">MARK·AI 社区 VIP</h2><button type="button" data-close-modal>关闭</button></div>
-      <form id="vipForm">
-        <label for="vipCode">输入授权码</label>
-        <p id="vipCodeHelp">完成交易后，向 Mark 领取授权码，再激活当前电脑。</p>
-        <div class="vip-code-row">
-          <input id="vipCode" type="password" required minlength="32" maxlength="32" autocomplete="off" spellcheck="false" placeholder="粘贴授权码" aria-describedby="vipCodeHelp">
-          <button id="vipSubmit" type="submit" class="vip-launch">激活本机</button>
-        </div>
-      </form>
-      <p id="vipStatus" role="status"></p>
-      <section class="vip-offer" aria-labelledby="vipOfferTitle">
-        <h3 id="vipOfferTitle">社区会员权益</h3>
-        <ul>
-          <li>基础 AI 教程</li>
-          <li>高级陪跑课程</li>
-          <li>Web3 + AI 应用技能</li>
-        </ul>
-        <p>社区 VIP 可永久使用「武林大会 · 共建平台」，软件与后续升级无需另付费。</p>
-      </section>
-      <section aria-labelledby="vipContactTitle">
-        <h3 id="vipContactTitle">扫码联系 Mark</h3>
-        <div class="vip-contacts">
-          <a href="wechat-contact.jpg" target="_blank" rel="noopener noreferrer"><span class="vip-qr vip-qr-wechat"><img src="wechat-contact.jpg" alt="Mark 的微信二维码"></span>微信</a>
-          <a href="debox-contact.jpg" target="_blank" rel="noopener noreferrer"><span class="vip-qr vip-qr-debox"><img src="debox-contact.jpg" alt="Mark 的 DeBox 二维码"></span>DeBox</a>
-        </div>
-      </section>
-    </dialog>
-    <dialog id="roadmapDialog" class="operator-modal" aria-labelledby="roadmapTitle">
-      <div class="modal-head"><h2 id="roadmapTitle">研发路线图</h2><button type="button" data-close-modal>关闭</button></div>
-      <p class="roadmap-note">以下功能正在规划，开放时间以版本公告为准。</p>
-      <ul class="roadmap-list">
-        <li><strong>固定价销毁债券抢购</strong><span>待研发</span></li>
-        <li><strong>AILGNS 抢购</strong><span>待研发</span></li>
-        <li><strong>P 链与 A 链债券一键领取</strong><span>待研发</span><p>计划覆盖日常 600、360 等债券。</p></li>
-      </ul>
-    </dialog>
     <dialog id="passwordDialog">
       <form method="dialog">
         <label id="passwordPrompt" for="deletePassword"
@@ -626,6 +587,6 @@
       </form>
     </dialog>
     <div id="copyNotice" class="copy-notice" role="status" aria-live="polite" hidden></div>
-    <script src="demo.js"></script><script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="collection.js"></script><script src="asset-ledger.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script><script src="vip.js"></script>
+    <script src="demo.js"></script><script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="collection.js"></script><script src="asset-ledger.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script>
   </body>
 </html>
