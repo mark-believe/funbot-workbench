@@ -45,22 +45,6 @@ header { background: #07111ff2; border-bottom: 1px solid var(--line-2); box-shad
 main.workspace { padding: 28px 28px 64px; gap: 22px; }
 body[data-view="stats"] main.workspace { max-width: 1580px; padding-top: 24px; }
 .workspace-content { min-width: 0; }
-.launchpad { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(330px,.7fr); gap: 26px; align-items: center; border: 1px solid #315064; border-radius: 20px; padding: clamp(24px,3.5vw,45px); margin-bottom: 25px; background: #0d1b2b; overflow: hidden; position: relative; }
-.launchpad:before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--jade); }
-.launchpad-eyebrow { color: var(--jade); font: 700 11px/1.4 var(--mono); letter-spacing: .15em; margin: 0 0 18px; }
-.launchpad h1 { margin: 0; font: 720 clamp(32px,3.5vw,54px)/1.18 var(--sans); letter-spacing: -.045em; }
-.launchpad h1 em { color: var(--jade); font-style: normal; }
-.launchpad-copy > p:last-of-type { max-width: 660px; color: var(--faint); font-size: 15px; margin: 15px 0 0; }
-.launchpad-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
-.launchpad-actions button { min-height: 44px; font-size: 14px; padding: 0 18px; }
-.launchpad-actions button span { margin-left: 8px; }
-.launchpad-steps { list-style: none; margin: 0; padding: 3px 0 3px 22px; border-left: 1px solid var(--line); display: grid; gap: 0; }
-.launchpad-steps li { display: grid; gap: 2px; padding: 11px 0 11px 24px; position: relative; }
-.launchpad-steps li:before { content: ""; position: absolute; left: -27px; top: 23px; width: 8px; height: 8px; border: 2px solid var(--jade); border-radius: 50%; background: var(--bg); }
-.launchpad-steps li:first-child:before { background: var(--jade); }
-.launchpad-steps span { color: var(--jade); font: 700 10px/1.4 var(--mono); letter-spacing: .12em; }
-.launchpad-steps strong { color: var(--ink); font-size: 16px; }
-.launchpad-steps small { color: var(--faint); font-size: 12px; }
 .desk-title { margin: 10px 0 16px; align-items: end; }
 .desk-title h1 { color: var(--ink); font-size: clamp(25px,2.2vw,32px); letter-spacing: -.025em; }
 .desk-title p, #ds-period { color: var(--faint); }
@@ -163,10 +147,6 @@ dialog::backdrop { background: #030a13c9; }
 @media (max-width: 1120px) {
   .bar { flex-wrap: wrap; }
   .bar .tabs { margin-left: auto; }
-  .launchpad { grid-template-columns: 1fr; gap: 14px; }
-  .launchpad-steps { grid-template-columns: repeat(3,1fr); border-left: 0; border-top: 1px solid var(--line); padding: 14px 0 0; }
-  .launchpad-steps li { padding: 10px 10px 4px 16px; }
-  .launchpad-steps li:before { left: 0; top: 17px; }
 }
 @media (max-width: 760px) {
   .bar { padding: 10px 14px; min-height: 0; gap: 8px; }
@@ -178,12 +158,6 @@ dialog::backdrop { background: #030a13c9; }
   .bar .tab { flex: 1; padding: 9px 4px; font-size: 12px; }
   .bar #systemIdentity, .bar #block { display: none; }
   main.workspace { padding: 18px 12px 45px; }
-  .launchpad { padding: 22px 18px; border-radius: 14px; }
-  .launchpad h1 { font-size: 31px; }
-  .launchpad-copy > p:last-of-type { font-size: 13px; }
-  .launchpad-steps { grid-template-columns: 1fr; }
-  .launchpad-steps li { padding: 7px 0 7px 18px; }
-  .launchpad-steps li:before { top: 13px; }
   #tab-stats .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   #tab-stats button.metric { min-width: 0; }
   .paper, #tab-stats .paper, #setupBody > section { padding: 15px; }
@@ -193,7 +167,6 @@ dialog::backdrop { background: #030a13c9; }
 }
 @media (max-width: 480px) {
   .bar #net { display: none; }
-  .launchpad-actions button { width: 100%; justify-content: space-between; }
   .desk-title { align-items: start; }
   #tab-stats .desk-title { flex-wrap: wrap; }
   #tab-stats .metric strong { font-size: 23px; }
@@ -202,3 +175,4 @@ dialog::backdrop { background: #030a13c9; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+.overview-actions { display: flex; flex-wrap: wrap; gap: 8px; }

@@ -324,7 +324,17 @@ let tab = "stats";
 let unlockOrigin = null;
 
 function openUnlock() {
-  if (!V?.locked || !V.hasVault) return;
+  if (!V || $("lockState").textContent === "连接中断") {
+    alert("请用本机程序启动时打印的完整链接重新打开工作台，再解锁。");
+    return;
+  }
+  if (!V.hasVault) {
+    showTab("setup");
+    $("secImportHelp").open = true;
+    $("secImportHelp").scrollIntoView({block:"start"});
+    return;
+  }
+  if (!V.locked) return;
   if (tab !== "setup") unlockOrigin = tab;
   showTab("setup");
   $("secUnlock").scrollIntoView({block:"center"});
@@ -399,8 +409,9 @@ function render() {
   if (V.busy) put("busy", V.busy, "chip warn");
 
   $("secUnlock").hidden = !(locked && V.hasVault);
-  $("openUnlock").hidden = $("secUnlock").hidden;
-  $("lockState").hidden = !$("openUnlock").hidden;
+  $("openUnlock").hidden = !locked && V.hasVault;
+  $("lockState").hidden = locked && V.hasVault;
+  if (!V.hasVault) put("lockState", "待导入账号", "chip");
   put("vaultPath", V.vaultPath);
   put("systemIdentity", `${V.systemName || "本地系统"} · 主号 ${short(V.master)}`);
   $("systemIdentity").title = V.dataDir || V.vaultPath || "";
@@ -1063,7 +1074,7 @@ async function tick() {
     render();
     if (tab === "setup" && !V.locked) loadMentors();
   } catch {
-    $("openUnlock").hidden = true;
+    $("openUnlock").hidden = false;
     $("lockState").hidden = false;
     put("lockState", "连接中断", "chip no");
   }

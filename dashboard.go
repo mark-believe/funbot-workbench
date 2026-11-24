@@ -25,14 +25,15 @@ type statToken struct {
 	Amount string
 }
 type statAccount struct {
-	Address, Label, Kind     string
-	Group, Games             int
-	Wallet                   string
-	Mint                     []uint64
-	Tokens                   []statToken
-	Stipends, ActiveStipends int
-	Wins                     int
-	Days                     map[string]matchDay
+	Address, Label, Kind       string
+	Group, Games               int
+	Wallet, Available, Deposit string
+	claimableJiazi             big.Int
+	Mint                       []uint64
+	Tokens                     []statToken
+	Stipends, ActiveStipends   int
+	Wins                       int
+	Days                       map[string]matchDay
 }
 type statReport struct {
 	Block, Timestamp, Period, Deadline uint64
@@ -130,6 +131,9 @@ func scanStats(ctx context.Context, c *Chain, seats []VaultMeta, matches *matchC
 	if err != nil {
 		return nil, err
 	}
+	return statsAt(ctx, c, sorted, height, ts, hash, matches)
+}
+func statsAt(ctx context.Context, c *Chain, sorted []VaultMeta, height, ts uint64, hash common.Hash, matches *matchCache) (*statReport, error) {
 	report := &statReport{Block: height, Timestamp: ts, Accounts: make([]statAccount, len(sorted))}
 	if len(sorted) == 0 {
 		return report, nil
@@ -192,6 +196,9 @@ func scanStats(ctx context.Context, c *Chain, seats []VaultMeta, matches *matchC
 					}})
 				} else {
 					a.Stipends++
+					if matches == nil {
+						a.claimableJiazi.Add(&a.claimableJiazi, w[i+5])
+					}
 					if w[i+2].Cmp(big.NewInt(60)) < 0 {
 						a.ActiveStipends++
 					}
@@ -224,6 +231,8 @@ func scanStats(ctx context.Context, c *Chain, seats []VaultMeta, matches *matchC
 			}
 			a.Games = int(w[13].Uint64())
 			a.Wallet = w[0].String()
+			a.Available = new(big.Int).Add(new(big.Int).Add(w[0], w[1]), w[3]).String()
+			a.Deposit = w[2].String()
 			return nil
 		}})
 	}
@@ -236,6 +245,21 @@ func scanStats(ctx context.Context, c *Chain, seats []VaultMeta, matches *matchC
 	}
 	if err = readStatCalls(ctx, c, tag, detail); err != nil {
 		return nil, err
+	}
+	if matches == nil {
+		for i := range report.Accounts {
+			a := &report.Accounts[i]
+			v, _ := new(big.Int).SetString(a.Available, 10)
+			v.Add(v, &a.claimableJiazi)
+			for _, t := range a.Tokens {
+				if t.Status == 2 {
+					n, _ := new(big.Int).SetString(t.Amount, 10)
+					v.Add(v, n)
+				}
+			}
+			a.Available = v.String()
+		}
+		return report, nil
 	}
 	next, err := readMatchHistory(ctx, c, report, hash, matches)
 	if err != nil {

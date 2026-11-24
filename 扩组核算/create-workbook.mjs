@@ -6,7 +6,7 @@ const notes=[
  "每行是一个组截至当日的累计快照。首次填写请补日期，后续日期追加新行；同组同日修改原行。蓝字为输入，未知金额留空。",
  "累计净收益填已实现收入扣除打局净损耗、运营费与折算 Gas 后的累计净额，可为负；返还本金、组内划转、待领与未到期甲子不算收益。",
  "可调配余额仅填本组已归属且可支配的现金。主号共享余额只分配一次；老组预留含周转金及需保留的本金。费用折算依据写入备注。",
- "打正：净收益 ≥ 投入；可开一组还需可调配余额 − 老组预留 ≥ 新组预算。250 条甲子是独立经验线。总览读取已保存的数据。"
+ "打正：净收益 ≥ 投入；可开一组还需可调配余额 − 老组预留 ≥ 新组预算。240 条甲子是独立经验线。总览读取已保存的数据。"
 ];
 for(let i=0;i<notes.length;i++){sheet.getRange("A"+(i+1)+":H"+(i+1)).merge();sheet.getRange("A"+(i+1)).values=[[notes[i]]];}
 sheet.getRange("A1:H1").format.fill="#174F46";sheet.getRange("A1:H1").format.font={bold:true,size:17,color:"#FFFFFF"};sheet.getRange("A1:H1").format.rowHeight=34;

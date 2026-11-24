@@ -63,6 +63,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/api/expansion", s.guard(s.expansion(false), false))
 	mux.HandleFunc("/api/expansion/open", s.guard(s.expansion(true), true))
 	mux.HandleFunc("/api/daily-fuze", s.guard(s.handleDailyReport, false))
+	mux.HandleFunc("/api/assets/change", s.guard(s.assetChange, false))
 	mux.HandleFunc("/api/dashboard", s.guard(s.handleDashboard, false))
 	mux.HandleFunc("/api/state", s.guard(s.handleState, false))
 	mux.HandleFunc("/api/unlock", s.guard(s.handleUnlock, true))

@@ -22,14 +22,14 @@ function renderMatchSummary(seats,groups){
  const picker=$("match-date");picker.max=today;picker.value=date;
  const summary=matchTotals(seats,date);
  const cards=[["全队累计盟主",summary.wins,"次",""],["当日新增盟主",summary.newWins,"次","wins"],
-  ["当日参赛",summary.games,"人次",""],["可铸令",seats.reduce((s,a)=>s+mintCount(a),0),"枚","mint"],
-  ["持有 NFT",seats.reduce((s,a)=>s+tokens(a).length,0),"枚","nft"],["本期可领福泽",seats.reduce((s,a)=>s+claimable(a).length,0),"枚","claim"]];
+  ["当日参赛",summary.games,"人次",""],["当前可铸令",seats.reduce((s,a)=>s+mintCount(a),0),"枚","mint"],
+  ["当前持有 NFT",seats.reduce((s,a)=>s+tokens(a).length,0),"枚","nft"],["本期可领福泽",seats.reduce((s,a)=>s+claimable(a).length,0),"枚","claim"]];
  setHTML("ds-cards",cards.map(([label,n,unit,filter])=>'<button type="button" class="metric" data-filter="'+filter+'"><span>'+label+'</span><strong>'+countFormat(n)+'<small>'+unit+'</small></strong></button>').join(""));
  const cells=(name,t)=>'<tr><th scope="row">'+name+'</th><td>'+countFormat(t.wins)+'</td><td class="wins-cell">+'+countFormat(t.newWins)+'</td><td>'+countFormat(t.games)+'</td><td>'+countFormat(t.games-t.settled)+'</td><td>'+(t.settled?(100*t.newWins/t.settled).toFixed(1)+"%":"—")+'</td></tr>';
  setHTML("match-groups",groups.map(g=>cells('<button class="group-link" data-group="'+g+'">第 '+g+' 组</button>',matchTotals(seats.filter(a=>a.Group===g),date))).join(""));
  setHTML("match-total",cells("全队合计",summary));
  const week=Array.from({length:7},(_,i)=>{
-  const day=new Date(Date.parse(today+"T00:00:00Z")+(i-6)*DAY_MS).toISOString().slice(0,10);
+  const day=new Date(Date.parse(date+"T00:00:00Z")+(i-6)*DAY_MS).toISOString().slice(0,10);
   const byGroup=groups.map(g=>seats.reduce((sum,a)=>sum+(a.Group===g?(a.Days?.[day]?.Wins||0):0),0));
   return {day,byGroup,count:byGroup.reduce((sum,n)=>sum+n,0)};
  }).reverse();

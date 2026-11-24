@@ -30,6 +30,7 @@ def evaluate(records):
     spare=cash-reserve if None not in (cash,reserve) else None
     funded=known and gap==0
     state="待核算" if not known else "未回本" if gap else "已回本"
+    if funded and None in (spare,budget): state="已回本·扩组待核算"
     if funded and None not in (spare,budget): state="可开一组" if spare>=budget else "已回本·资金不足"
     eta=None;span=None
     if known and gap>0:
@@ -95,7 +96,7 @@ def notify():
     prior=json.loads(statefile.read_text("utf8")) if statefile.exists() else {}
     current={};messages=[]
     for g,n in counts.items():
-        r=ledger.get(g,{});state=r.get("state","待核算");met=n>=250
+        r=ledger.get(g,{});state=r.get("state","待核算");met=n>=240
         current[g]=[state,met]
         prev=prior.get(g,["待核算",False])
         if state!=prev[0] and (state.startswith("已回本") or state=="可开一组" or prev[0] not in ("待核算","未回本")):

@@ -22,16 +22,20 @@
         <span id="lockState" class="chip" role="status">连接中</span>
         <span id="block" class="chip">—</span>
         <span id="busy" class="chip warn" hidden>—</span>
-        <button id="openUnlock" class="unlock-entry" type="button" aria-controls="secUnlock" hidden>解锁工作台</button>
+        <button id="openUnlock" class="unlock-entry" type="button" aria-controls="secUnlock">解锁工作台</button>
       </div>
     </header>
 
     <main class="workspace">
       <div class="workspace-content">
- <section class="launchpad" aria-label="开始使用共建工作台"><div class="launchpad-copy"><p class="launchpad-eyebrow">MARK·AI LAB / COMMUNITY TOOL</p><h1>看清进度，<em>再开始下一步。</em></h1><p>从账号准备到批量执行，把需要核对的状态和操作集中在一个本地工作台。</p><div class="launchpad-actions"><button type="button" class="go" data-tab-target="setup">设置账号与合约 <span aria-hidden="true">↗</span></button><button type="button" data-tab-target="play">进入执行台 <span aria-hidden="true">→</span></button></div></div><ol class="launchpad-steps" aria-label="开始操作的三个步骤"><li><span>01 / 准备</span><strong>导入并解锁</strong><small>密钥只在本机终端输入</small></li><li><span>02 / 连接</span><strong>载入 Squad 合约</strong><small>核对地址、网络与名册</small></li><li><span>03 / 执行</span><strong>预览后开跑</strong><small>关注余额、局数与回执</small></li></ol></section>
+
         <div id="tab-stats">
 
- <div class="desk-title"><div><h1>共建总览</h1><p id="ds-status" role="status">正在读取链上数据…</p></div><button id="ds-refresh">刷新统计</button></div>
+ <div class="desk-title"><div><h1>共建总览</h1><p id="ds-status" role="status">正在读取链上数据…</p></div><div class="overview-actions"><button data-tab-target="setup">账号与合约</button><button data-tab-target="play">进入执行台</button><button id="ds-refresh">刷新统计</button></div></div>
+ <section class="paper"><h2>可用资产变动 · fLGNS</h2>
+<form id="assetRange"><label>统计范围 <select id="assetMode"><option value="day">北京时间全天</option><option value="blocks">打局至归集</option></select></label>
+<input type="date" id="assetDay" aria-label="统计日期"><span id="assetBounds" hidden><input id="assetFirst" inputmode="numeric" placeholder="首笔交易区块" aria-label="首笔交易区块"><input id="assetLast" inputmode="numeric" placeholder="末笔交易区块" aria-label="末笔交易区块"></span> <button>查询变动</button></form>
+<p id="assetStatus" role="status">选择日期，或输入该组首末交易的区块号。</p><div id="assetRows"></div></section>
  <div id="ds-cards" class="metric-grid"></div>
  <div class="match-grid"><section class="paper group-report"><div class="chart-head"><h2>分组战绩</h2><label class="date-filter">比赛日 <input type="date" id="match-date"></label></div>
  <div class="table-scroll"><table class="match-table"><thead><tr><th>账号组</th><th>累计盟主</th><th>当日新增</th><th>参赛人次</th><th>待裁决</th><th>胜率</th></tr></thead><tbody id="match-groups"></tbody><tfoot id="match-total"></tfoot></table></div>
@@ -39,8 +43,8 @@
  <section class="paper trend"><div class="chart-head"><h2>近七日新增盟主</h2></div><div id="match-week"></div></section></div>
  <section class="paper expansion-report"><div class="chart-head"><h2>分组回本与扩组</h2><div class="book-tools"><button id="ex-read">重读核算表</button><button id="ex-open">打开核算表</button></div></div>
 <p id="ex-note" role="status">正在核对甲子俸和资金记录…</p>
-<div class="table-scroll"><table class="match-table"><thead><tr><th>组别</th><th>累计 / 在产甲子</th><th>距 250 条</th><th>回本 / 扩组状态</th><th>尚差回本</th><th>首次确认 / 推算日</th><th>预留后余额</th><th>资金缺口</th><th>核算日</th></tr></thead><tbody id="ex-groups"></tbody></table></div>
-<details><summary>填写方法与计算依据</summary><p>打开独立 Excel，以 fLGNS 填每组的累计投入、累计已实现净收益、可调配余额、老组预留和新组预算。扣除费用，统一折算 Gas；共享主号余额只能归属一次。日期不同请追加一行，保存后点「重读核算表」。</p><p>净收益达到投入即回本；还需预留后余额够开一组，才显示「可开一组」。首次确认取最早达标的核算记录；未回本时，按同一投入下最近 7–30 天的净收益增速外推，仅供观察。在产指有效天数不足 60 天。250 条观察线按累计条数计算。</p></details></section>
+<div class="table-scroll"><table class="match-table"><thead><tr><th>组别</th><th>累计 / 在产甲子</th><th>距 240 条</th><th>回本 / 扩组状态</th><th>尚差回本</th><th>首次确认 / 推算日</th><th>预留后余额</th><th>资金缺口</th><th>核算日</th></tr></thead><tbody id="ex-groups"></tbody></table></div>
+<details><summary>填写方法与计算依据</summary><p>打开独立 Excel，以 fLGNS 填每组的累计投入、累计已实现净收益、可调配余额、老组预留和新组预算。扣除费用，统一折算 Gas；共享主号余额只能归属一次。日期不同请追加一行，保存后点「重读核算表」。</p><p>净收益达到投入即回本；还需预留后余额够开一组，才显示「可开一组」。首次确认取最早达标的核算记录；未回本时，按同一投入下最近 7–30 天的净收益增速外推，仅供观察。在产指有效天数不足 60 天。240 条观察线按累计条数计算。</p></details></section>
  <section class="paper account-report"><div class="chart-head"><h2>账号明细</h2><span id="ds-count"></span></div><div class="filters"><input id="ds-search" type="search" placeholder="搜索账号、地址或 NFT 编号" aria-label="搜索账号、地址或 NFT 编号"><select id="ds-group" aria-label="选择账号组"><option value="">全部组</option></select><select id="ds-filter" aria-label="账号状态"><option value="">全部状态</option><option value="wins">当日获盟主</option><option value="mint">可铸令</option><option value="nft">持有 NFT</option><option value="claim">本期福泽可领</option></select></div>
  <div class="table-scroll"><table class="account-grid"><thead><tr><th>账号 / 地址</th><th>组别</th><th>累计盟主</th><th>当日新增</th><th>当日参赛</th><th>可铸令</th><th>NFT</th><th>可领福泽</th></tr></thead><tbody id="ds-rows"></tbody></table></div></section><div class="reward-grid"> <section id="daily-fuze" class="paper daily-panel"><div class="chart-head"><h2>主号每日福泽</h2><span class="read-mode">只读模拟</span></div>
  <p id="df-status" role="status">正在读取每日检查记录…</p>
@@ -566,6 +570,6 @@
       </form>
     </dialog>
     <div id="copyNotice" class="copy-notice" role="status" aria-live="polite" hidden></div>
-    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="mark-ai.js"></script>
+    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script>
   </body>
 </html>
