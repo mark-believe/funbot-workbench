@@ -27,7 +27,22 @@ func main() {
 	gwei := flag.Int64("gas-price", 12, "gas 价格（gwei）。12 是这条链的底价，拥堵时才需要调高")
 	flag.BoolVar(&noOpen, "no-open", false, "不要自动打开浏览器")
 	addKind := flag.String("add", "", "在终端里导号：master / member / derive（一条助记词派生一批）")
+	oldRoot := flag.String("migrate-from", "", "从已关闭的旧工作台目录复制账户、设置和核算记录")
+	assetDate := flag.String("asset-day", "", "用扩组核算/groups.json 公开名册核对北京时间全天资产")
 	flag.Parse()
+	if *assetDate != "" {
+		if err := printAssetDay(*assetDate); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+	if *oldRoot != "" {
+		if err := migrateWorkbench(*oldRoot, *keyfile); err != nil {
+			log.Fatal(err)
+		}
+		log.Print("迁移完成，使用原密码解锁")
+		return
+	}
 	if err := initializeVaultLocation(*keyfile); err != nil {
 		log.Fatal(err)
 	}

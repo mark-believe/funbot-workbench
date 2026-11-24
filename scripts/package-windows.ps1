@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$GoExecutable = 'go',
   [string]$OutputDir = (Join-Path $PSScriptRoot '..\dist')
 )
@@ -24,13 +24,19 @@ try {
   foreach ($file in @('README.md', 'LICENSE', 'NOTICE.md', 'DEPLOYMENT.md')) {
     Copy-Item -LiteralPath (Join-Path $repo $file) -Destination $stage
   }
-  foreach ($folder in @('福泽模拟', '扩组核算')) {
-    Copy-Item -LiteralPath (Join-Path $repo $folder) -Destination $stage -Recurse
+  foreach ($file in @('福泽模拟/daily.py','扩组核算/evaluate.py','扩组核算/create-workbook.mjs')) {
+    $dest = Join-Path $stage $file
+    New-Item -Force -ItemType Directory -Path (Split-Path $dest) | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repo $file) -Destination $dest
+  }
+  foreach ($file in @('Install.cmd','Migrate.cmd','workbench.ico')) {
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination $stage
   }
 
   $asset = 'MARKAI-Funbot-Workbench-Windows-x64.zip'
   $archive = Join-Path $destination $asset
   if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
   [System.IO.Compression.ZipFile]::CreateFromDirectory(
     $stage, $archive, [System.IO.Compression.CompressionLevel]::Optimal,
     $false, [System.Text.Encoding]::UTF8

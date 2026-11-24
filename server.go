@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"syscall"
@@ -23,6 +24,8 @@ import (
 )
 
 type Server struct {
+	assets        assetCache
+	assetChain    *Chain
 	stats         statCache
 	ks            *Keystore
 	st            *State
@@ -45,7 +48,7 @@ func NewServer(ks *Keystore, st *State, run *Runner, b *Batch, c *Chain) (*Serve
 	}
 	c.journalPath = ks.Path() + ".pending.json"
 	run.settings = settings
-	return &Server{settings: settings, ks: ks, st: st, run: run, batch: b, chain: c, token: hex.EncodeToString(buf)}, nil
+	return &Server{assetChain: NewChain(slices.Clone(c.rpcs), c.chainID), settings: settings, ks: ks, st: st, run: run, batch: b, chain: c, token: hex.EncodeToString(buf)}, nil
 }
 
 func (s *Server) Token() string { return s.token }
@@ -63,6 +66,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/api/expansion", s.guard(s.expansion(false), false))
 	mux.HandleFunc("/api/expansion/open", s.guard(s.expansion(true), true))
 	mux.HandleFunc("/api/daily-fuze", s.guard(s.handleDailyReport, false))
+	mux.HandleFunc("/api/asset-windows", s.guard(s.handleAssetWindows, false))
+	mux.HandleFunc("/api/asset-balances", s.guard(s.handleAssetBalances, false))
 	mux.HandleFunc("/api/assets/change", s.guard(s.assetChange, false))
 	mux.HandleFunc("/api/dashboard", s.guard(s.handleDashboard, false))
 	mux.HandleFunc("/api/state", s.guard(s.handleState, false))

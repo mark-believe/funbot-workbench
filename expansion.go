@@ -62,6 +62,13 @@ func (s *Server) expansion(open bool) http.HandlerFunc {
 			return
 		}
 		python := filepath.Join(home, ".cache", "codex-runtimes", "codex-primary-runtime", "dependencies", "python", "pythonw.exe")
+		if _, err := os.Stat(python); os.IsNotExist(err) {
+			python, err = exec.LookPath("python")
+			if err != nil {
+				s.fail(w, 503, fmt.Errorf("读取工作簿需要安装 Python 3 和 openpyxl"))
+				return
+			}
+		}
 		ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
 		defer cancel()
 		out, err := exec.CommandContext(ctx, python, "-B", filepath.Join(dir, "evaluate.py"), "--read").Output()

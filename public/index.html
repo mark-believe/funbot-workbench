@@ -32,10 +32,20 @@
         <div id="tab-stats">
 
  <div class="desk-title"><div><h1>共建总览</h1><p id="ds-status" role="status">正在读取链上数据…</p></div><div class="overview-actions"><button data-tab-target="setup">账号与合约</button><button data-tab-target="play">进入执行台</button><button id="ds-refresh">刷新统计</button></div></div>
- <section class="paper"><h2>可用资产变动 · fLGNS</h2>
+ <section class="paper asset-ledger" id="asset-ledger">
+  <div class="chart-head"><h2>可用资产变动 <small>fLGNS</small></h2><label class="date-filter">记账日 <input id="ledger-date" type="date"></label></div>
+  <div class="ledger-main"><div><span id="ledger-period">全队当日变动</span><strong id="ledger-net">—</strong></div><div><span id="ledger-start-label">日初可用</span><strong id="ledger-start">—</strong></div><div><span id="ledger-end-label">截至当前</span><strong id="ledger-end">—</strong></div></div>
+  <h3>逐组打完后的变化</h3><p id="ledger-stage-status" role="status"></p>
+  <div class="table-scroll"><table class="match-table"><thead><tr><th>打局 / 归集时段</th><th>打前全队可用</th><th>打后全队可用</th><th>本段变化</th><th>明细</th></tr></thead><tbody id="ledger-stages"></tbody></table></div>
+  <p id="ledger-reconcile" role="status"></p><div class="ledger-tools"><label>查看时段 <select id="ledger-window"><option value="day">北京时间全天</option></select></label><span id="ledger-time" role="status"></span></div>
+  <div class="table-scroll"><table class="match-table"><thead><tr><th>账号组</th><th>期初可用</th><th>期末可用</th><th>净变化</th><th>期末局内占用</th></tr></thead><tbody id="ledger-groups"></tbody></table></div>
+  <details id="ledger-detail"><summary id="ledger-detail-title">逐账号资产明细</summary><div class="filters"><select id="ledger-group" aria-label="账号组"></select><input type="search" id="ledger-search" aria-label="搜索资产账号" placeholder="账号名称或地址"></div><div class="table-scroll ledger-scroll"><table class="match-table"><thead><tr><th>账号</th><th>期初可用</th><th>期末可用</th><th>净变化</th><th>钱包</th><th>擂台可取</th><th>可领甲子</th><th>可领师承</th><th>可领福泽</th><th>局内占用</th></tr></thead><tbody id="ledger-accounts"></tbody></table></div><small>右侧分项均为期末余额。悬停金额可看完整精度。</small></details>
+  <details><summary>金额怎么算</summary><p>可用资产 = 钱包 fLGNS + 已结算擂台余额 + 可领甲子 + 可领师承 + 本期可领福泽。局内押金单列。甲子未来额度、NFT 估值及 DAI Gas 均单独核算。净变化 = 期末可用 − 期初可用，包含外部转入转出。同一名册内归集时，转出和转入在全队合计中抵消。</p><p>全天按北京时间零点前最后一个区块起算。分组时段取主号 Squad 同组连续打局、归集的首笔前一区块和末笔所在区块；末笔仅入场时，押金仍可能占用。时段间的释放、转账也计入全天。各天均按当前名册比较。</p></details>
+ </section>
+ <details><summary>自选区块核对</summary><section class="paper"><h2>可用资产变动 · fLGNS</h2>
 <form id="assetRange"><label>统计范围 <select id="assetMode"><option value="day">北京时间全天</option><option value="blocks">打局至归集</option></select></label>
 <input type="date" id="assetDay" aria-label="统计日期"><span id="assetBounds" hidden><input id="assetFirst" inputmode="numeric" placeholder="首笔交易区块" aria-label="首笔交易区块"><input id="assetLast" inputmode="numeric" placeholder="末笔交易区块" aria-label="末笔交易区块"></span> <button>查询变动</button></form>
-<p id="assetStatus" role="status">选择日期，或输入该组首末交易的区块号。</p><div id="assetRows"></div></section>
+<p id="assetStatus" role="status">选择日期，或输入该组首末交易的区块号。</p><div id="assetRows"></div></section></details>
  <div id="ds-cards" class="metric-grid"></div>
  <div class="match-grid"><section class="paper group-report"><div class="chart-head"><h2>分组战绩</h2><label class="date-filter">比赛日 <input type="date" id="match-date"></label></div>
  <div class="table-scroll"><table class="match-table"><thead><tr><th>账号组</th><th>累计盟主</th><th>当日新增</th><th>参赛人次</th><th>待裁决</th><th>胜率</th></tr></thead><tbody id="match-groups"></tbody><tfoot id="match-total"></tfoot></table></div>
@@ -48,7 +58,7 @@
  <section class="paper account-report"><div class="chart-head"><h2>账号明细</h2><span id="ds-count"></span></div><div class="filters"><input id="ds-search" type="search" placeholder="搜索账号、地址或 NFT 编号" aria-label="搜索账号、地址或 NFT 编号"><select id="ds-group" aria-label="选择账号组"><option value="">全部组</option></select><select id="ds-filter" aria-label="账号状态"><option value="">全部状态</option><option value="wins">当日获盟主</option><option value="mint">可铸令</option><option value="nft">持有 NFT</option><option value="claim">本期福泽可领</option></select></div>
  <div class="table-scroll"><table class="account-grid"><thead><tr><th>账号 / 地址</th><th>组别</th><th>累计盟主</th><th>当日新增</th><th>当日参赛</th><th>可铸令</th><th>NFT</th><th>可领福泽</th></tr></thead><tbody id="ds-rows"></tbody></table></div></section><div class="reward-grid"> <section id="daily-fuze" class="paper daily-panel"><div class="chart-head"><h2>主号每日福泽</h2><span class="read-mode">只读模拟</span></div>
  <p id="df-status" role="status">正在读取每日检查记录…</p>
- <div class="daily-metrics"><div>本次可领<strong id="df-amount">—</strong></div><div>模拟 Gas<strong id="df-gas">—</strong></div><div>累计实际到账<strong id="df-actual">—</strong></div><div>累计实际 Gas<strong id="df-paid">—</strong></div></div>
+ <p id="df-snapshot" hidden></p><div class="daily-metrics"><div>本次可领<strong id="df-amount">—</strong></div><div>模拟 Gas<strong id="df-gas">—</strong></div><div>累计实际到账<strong id="df-actual">—</strong></div><div>累计实际 Gas<strong id="df-paid">—</strong></div></div>
  <details><summary>查看范围与领取回执</summary><p id="df-scope"></p><div id="df-ledger"></div></details></section>
 <section class="paper"><h2>本期福泽分布</h2><div id="ds-distribution"></div><p id="ds-period"></p></section></div></div>
  <div id="tab-assets" hidden><div class="desk-title"><h1>令牌中心</h1></div>
@@ -570,6 +580,6 @@
       </form>
     </dialog>
     <div id="copyNotice" class="copy-notice" role="status" aria-live="polite" hidden></div>
-    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script>
+    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="asset-ledger.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script>
   </body>
 </html>

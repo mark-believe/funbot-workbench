@@ -1,8 +1,8 @@
 """Daily read-only audit. Uses public addresses; has no signing or sending API."""
+import http.client
 import json
 import os
-import subprocess
-import sys
+import ssl
 import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -18,28 +18,61 @@ ROOT = Path(__file__).resolve().parent
 CN = timezone(timedelta(hours=8))
 ALLOWED = {"eth_call","eth_getBlockByNumber","eth_chainId","eth_gasPrice","eth_simulateV1",
            "eth_getLogs","eth_getTransactionByHash","eth_getTransactionReceipt"}
+NODES = ("rpc.anubispace.org", "rpc1.anubispace.org", "rpc2.anubispace.org")
+
+class NodeError(Exception):
+    def __init__(self, code, message):
+        super().__init__(message)
+        self.code = code
+
+class ReadOnlyRPC:
+    def __init__(self, host):
+        self.conn = http.client.HTTPSConnection(host, timeout=25, context=ssl.create_default_context())
+
+    def request(self, req):
+        try:
+            self.conn.request("POST", "/", body=json.dumps(req).encode(),
+                              headers={"Content-Type": "application/json"})
+            response = self.conn.getresponse()
+            if response.status != 200:
+                raise NodeError("rpc", f"节点服务暂不可用（HTTP {response.status}）")
+            answers = json.loads(response.read())
+        except ssl.SSLError as err:
+            raise NodeError("tls", "未能和节点建立安全连接") from err
+        except (OSError, http.client.HTTPException) as err:
+            raise NodeError("network", "节点连接中断或超时") from err
+        except (ValueError, UnicodeError) as err:
+            raise NodeError("rpc", "节点返回的数据格式异常") from err
+        if not isinstance(answers, list) or len(answers) != len(req):
+            raise NodeError("rpc", "节点返回的结果数量不符")
+        by_id = {}
+        for answer in answers:
+            if not isinstance(answer, dict) or type(answer.get("id")) is not int or answer["id"] in by_id:
+                raise NodeError("rpc", "节点返回的结果编号不符")
+            by_id[answer["id"]] = answer
+        values = []
+        for item in req:
+            answer = by_id.get(item["id"], {})
+            if answer.get("result") is None or "error" in answer:
+                raise NodeError("rpc", f"节点未能完成只读查询（{item['method']}）")
+            values.append(answer["result"])
+        return values
 def require(condition, message):
     if not condition:
         raise ValueError(message)
 
-def batch(calls):
+def batch(client, calls):
     results = []
     for offset in range(0,len(calls),16):
         req = []
         for i,(method,params) in enumerate(calls[offset:offset+16]):
             require(method in ALLOWED,"RPC method not permitted")
             req.append(dict(jsonrpc="2.0",id=i,method=method,params=params))
-        raw = subprocess.run(["curl.exe","-fsS","--retry","2","--max-time","40","-H","Content-Type: application/json",
-                              "--data-binary","@-","https://rpc.anubispace.org"],input=json.dumps(req).encode(),capture_output=True,check=True)
-        answers = {r["id"]:r for r in json.loads(raw.stdout)}
-        for i in range(len(req)):
-            answer = answers[i]
-            require("result" in answer and answer["result"] is not None,str(answer.get("error","RPC missing result")))
-            results.append(answer["result"])
+        results.extend(client.request(req))
     return results
 
-def rpc(method,*params):
-    return batch([(method,list(params))])[0]
+def rpc(client,method,*params):
+    return batch(client,[(method,list(params))])[0]
 
 def word(n):
     return format(n,"064x")
@@ -65,18 +98,18 @@ def check_simulated(calls,amount,eligible):
     require(gas>0,"模拟 Gas 无效")
     return gas
 
-def confirmed(start,end,previous):
+def confirmed(client,start,end,previous):
     ledger=list(previous)
     topic="0x"+word(int(MASTER,16))
     # Discover successful direct claims through fLGNS transfers to the master.
     for lo in range(start,end+1,2000):
         flt={"address":TOKEN,"topics":[TRANSFER,None,topic],"fromBlock":hex(lo),"toBlock":hex(min(end,lo+1999))}
-        logs=rpc("eth_getLogs",flt)
+        logs=rpc(client,"eth_getLogs",flt)
         totals={}
         for event in logs:
             h=event["transactionHash"]
             totals[h]=totals.get(h,0)+int(event["data"],16)
-        txs=batch([("eth_getTransactionByHash",[h]) for h in totals])
+        txs=batch(client,[("eth_getTransactionByHash",[h]) for h in totals])
         for tx in txs:
             data=tx["input"]
             if tx["from"].lower()!=MASTER or (tx["to"] or "").lower()!=REWARD or not data.startswith("0xb1b66652"):
@@ -86,26 +119,29 @@ def confirmed(start,end,previous):
             if not set(ids).intersection(IDS):
                 continue
             require(set(ids)<=set(IDS),"发现混合清单领取，请核对后归属手续费")
-            rec=rpc("eth_getTransactionReceipt",tx["hash"])
+            rec=rpc(client,"eth_getTransactionReceipt",tx["hash"])
             require(rec["status"]=="0x1" and rec["blockHash"]==tx["blockHash"],"领取回执状态不一致")
             gas=int(rec["gasUsed"],16)
             ledger.append(dict(hash=tx["hash"],block=int(rec["blockNumber"],16),period=period,ids=ids,
                                amount=str(totals[tx["hash"]]),gas=gas,fee=str(gas*int(rec["effectiveGasPrice"],16))))
     return ledger
 
-def run():
-    require(FIRST>0 and int(MASTER,16)!=0 and len(set(IDS))==42,"清单数量不符")
-    require(int(rpc("eth_chainId"),16)==6714,"网络不符")
-    head=rpc("eth_getBlockByNumber","latest",False)
+def audit(client):
+    require(len(set(IDS))==42,"清单数量不符")
+    if int(rpc(client,"eth_chainId"),16)!=6714:
+        raise NodeError("rpc","节点返回的链不符")
+    head=rpc(client,"eth_getBlockByNumber","latest",False)
     tag=head["number"];height=int(tag,16);ts=int(head["timestamp"],16)
-    first,nft,token=batch([call(REWARD,"0xa32093c0"+word(1),tag),call(REWARD,"0x7c0b8de2",tag),call(REWARD,"0x82bfefc8",tag)])
+    if not -120 <= datetime.now(CN).timestamp()-ts <= 600:
+        raise NodeError("rpc","节点区块时间滞后或异常")
+    first,nft,token=batch(client,[call(REWARD,"0xa32093c0"+word(1),tag),call(REWARD,"0x7c0b8de2",tag),call(REWARD,"0x82bfefc8",tag)])
     require(int(nft,16)==int(NFT,16) and int(token,16)==int(TOKEN,16),"福泽合约配置不符")
     period=1 if ts<int(first,16) else 2+(ts-int(first,16))//518400
-    owners=batch([call(NFT,"0x6352211e"+word(i),tag) for i in IDS])
+    owners=batch(client,[call(NFT,"0x6352211e"+word(i),tag) for i in IDS])
     held=[i for i,o in zip(IDS,owners) if int(o,16)==int(MASTER,16)]
     reads=[call(REWARD,"0x3bf2a83e"+word(period)+word(i),tag) for i in held]
     eligible=[]; amount=0
-    for i,raw in zip(held,batch(reads)):
+    for i,raw in zip(held,batch(client,reads)):
         value,status=words(raw)
         require(status in range(7),"未知福泽状态")
         if status==2:
@@ -115,19 +151,21 @@ def run():
         balance={"from":MASTER,"to":TOKEN,"data":"0x70a08231"+word(int(MASTER,16))}
         claim={"from":MASTER,"to":REWARD,"data":claim_data(period,eligible)}
         checks=[{"from":MASTER,"to":REWARD,"data":"0x3bf2a83e"+word(period)+word(i)} for i in eligible]
-        sim=rpc("eth_simulateV1",{"blockStateCalls":[{"calls":[balance,claim,balance,*checks]}],"validation":False},tag)
+        sim=rpc(client,"eth_simulateV1",{"blockStateCalls":[{"calls":[balance,claim,balance,*checks]}],"validation":False},tag)
         gas=check_simulated(sim[0]["calls"],amount,eligible)
-        fee=gas*int(rpc("eth_gasPrice"),16)
+        fee=gas*int(rpc(client,"eth_gasPrice"),16)
     path=ROOT/"latest.json"
     start=FIRST;previous=[]
     if path.exists():
         old=json.loads(path.read_text("utf-8"))
-        require(height>=old["block"],"节点高度滞后")
-        oldhead=rpc("eth_getBlockByNumber",hex(old["block"]),False)
+        if height<old["block"]:
+            raise NodeError("rpc","节点高度落后于上次核验")
+        oldhead=rpc(client,"eth_getBlockByNumber",hex(old["block"]),False)
         if oldhead["hash"]==old["hash"]:
             start=old["block"]+1;previous=old["ledger"]
-    ledger=confirmed(start,height,previous)
-    require(rpc("eth_getBlockByNumber",tag,False)["hash"]==head["hash"],"区块重组，请重试")
+    ledger=confirmed(client,start,height,previous)
+    if rpc(client,"eth_getBlockByNumber",tag,False)["hash"]!=head["hash"]:
+        raise NodeError("rpc","核验期间区块已重组")
     return dict(block=height,hash=head["hash"],timestamp=ts,period=period,held=len(held),missing=sorted(set(IDS)-set(held)),
                 eligible=eligible,amount=str(amount),gas=gas,fee=str(fee),ledger=ledger,
                 actualAmount=str(sum(int(r["amount"]) for r in ledger)),actualGas=sum(r["gas"] for r in ledger),
@@ -138,13 +176,28 @@ def save(name,value):
         json.dump(value,f,ensure_ascii=False)
     os.replace(f.name,ROOT/name)
 
+def run():
+    require(FIRST > 0 and int(MASTER,16) != 0 and len(set(IDS)) == 42, "请先配置主号、起始区块和福泽清单")
+    last = None
+    for host in NODES:
+        client = ReadOnlyRPC(host)
+        try:
+            return audit(client)
+        except NodeError as err:
+            last = err
+        finally:
+            client.conn.close()
+    raise NodeError(last.code, f"三个节点均未完成核验。{last}") from last
+
 if __name__=="__main__":
     try:
         result=run()
-        save("latest.json",result)
         save(datetime.fromtimestamp(result["timestamp"],CN).strftime("%Y-%m-%d.json"),result)
+        save("latest.json",result)
         save("status.json",{"ok":True})
         print(json.dumps({k:result[k] for k in ("block","period","held","eligible","amount","gas","actualAmount","actualGas")}))
     except Exception as exc:
-        save("status.json",{"ok":False,"at":datetime.now(CN).isoformat(timespec="minutes"),"error":str(exc)[:400]})
+        code = exc.code if isinstance(exc,NodeError) else "audit"
+        message = str(exc) if isinstance(exc,(NodeError,ValueError)) else "福泽检查未完成"
+        save("status.json",{"ok":False,"at":datetime.now(CN).isoformat(timespec="minutes"),"code":code,"error":message[:180]})
         raise

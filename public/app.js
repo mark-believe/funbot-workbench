@@ -1,6 +1,11 @@
 const $ = (id) => document.getElementById(id);
 
-const TOKEN = new URLSearchParams(location.search).get("t") || "";
+const launchToken = new URLSearchParams(location.search).get("t");
+let TOKEN = launchToken || "";
+try {
+  if (launchToken) sessionStorage.setItem("workbench.session", launchToken);
+  else TOKEN = sessionStorage.getItem("workbench.session") || "";
+} catch {}
 if (TOKEN && window.history.replaceState) {
   window.history.replaceState(null, "", location.pathname);
 }
