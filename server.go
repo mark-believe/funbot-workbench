@@ -24,6 +24,7 @@ import (
 )
 
 type Server struct {
+	collection    collectionApproval
 	assets        assetCache
 	assetChain    *Chain
 	stats         statCache
@@ -55,6 +56,8 @@ func (s *Server) Token() string { return s.token }
 
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("/api/mandate/collection-plan", s.guard(s.previewCollection, false))
+	mux.HandleFunc("/api/mandate/collection-confirm", s.guard(s.confirmCollection, true))
 	mux.HandleFunc("/api/mandate/mint-four", s.guard(s.handleMandate(true), true))
 	mux.HandleFunc("/api/mandate/collect-37", s.guard(s.handleCollect37, true))
 	mux.HandleFunc("/api/mandate/transfer-selected", s.guard(s.handleMandate(false), true))
@@ -188,6 +191,7 @@ func (s *Server) snapshot() View {
 	v.Settings = s.settings.Get()
 	v.Locked = s.ks.Locked()
 	v.HasVault = s.ks.Exists()
+	v.LegacyMandates = mandateMaster != (common.Address{}) && mandateSquad != (common.Address{}) && mandateHolder != (common.Address{}) && len(originalMandates) == 38 && len(collectOrder) == 37 && len(alreadyOwned) == 5
 	v.Seats = s.ks.Meta()
 	local := make(map[common.Address]bool, len(v.Seats))
 	for _, seat := range v.Seats {

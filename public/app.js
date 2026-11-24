@@ -396,6 +396,7 @@ function showTab(which) {
 }
 
 function render() {
+  for(const id of ["collect37","giftSelected","mintFour"]) $(id).disabled = !V?.legacyMandates || !!V?.locked || !!V?.busy;
   if (!V || selectionDrag) return;
   const locked = V.locked;
   put("balanceStatus", V.balanceError

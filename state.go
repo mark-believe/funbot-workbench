@@ -34,6 +34,7 @@ type Line struct {
 }
 
 type View struct {
+	LegacyMandates      bool                `json:"legacyMandates"`
 	ChampionshipsError  string              `json:"championshipsError,omitempty"`
 	MasterChampionships *string             `json:"masterChampionships"`
 	SystemName          string              `json:"systemName"`

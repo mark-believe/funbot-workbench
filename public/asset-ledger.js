@@ -59,10 +59,19 @@
   }).join("");
   renderAccounts();
  }
+ const expandedStages=new Set();
+ function stageAccounts(val,w,i){
+  const rows=val.rows.filter(r=>w.Unknown||w.Groups?.includes(r.s.Group)||r.d!==0n);
+  return '<tr><td colspan="5"><details data-stage-detail="'+i+'" '+(expandedStages.has(i)?'open':'')+'><summary>逐账户变动 · '+rows.length+' 个账户</summary><table class="match-table"><thead><tr><th>账户 / 地址</th><th>打前可用</th><th>打后可用</th><th>净变化</th></tr></thead><tbody>'+rows.map(({s,p,d})=>'<tr><th>'+esc(s.Label||groupName(s.Group))+' <small>'+esc(s.Address)+'</small></th><td>'+amount(p.Available)+'</td><td>'+amount(s.Available)+'</td><td>'+amount(d,true)+'</td></tr>').join("")+'</tbody></table></details></td></tr>';
+ }
+ $("ledger-stages").addEventListener("toggle",e=>{
+  const id=e.target.dataset.stageDetail;if(id===undefined||!e.target.isConnected)return;
+  if(e.target.open)expandedStages.add(+id);else expandedStages.delete(+id);
+ },true);
  function renderStages(){
   $("ledger-stages").innerHTML=windows.map((w,i)=>{
    const val=stageRows[i];
-   return "<tr><th>"+esc(stageName(w))+' <small>'+clock(w.After)+'</small></th>'+(val?.rows?[amount(val.before),amount(val.after),amount(val.after-val.before,true)].map(s=>"<td>"+s+"</td>").join(""):'<td colspan="3">'+(val?.error?'读取失败，点明细重试':'读取中…')+'</td>')+'<td><button type="button" class="group-link" data-stage="'+i+'">明细</button></td></tr>';
+   return "<tr><th>"+esc(stageName(w))+' <small>'+clock(w.After)+'</small></th>'+(val?.rows?[amount(val.before),amount(val.after),amount(val.after-val.before,true)].map(s=>"<td>"+s+"</td>").join(""):'<td colspan="3">'+(val?.error?'读取失败，点明细重试':'读取中…')+'</td>')+'<td><button type="button" class="group-link" data-stage="'+i+'">明细</button></td></tr>'+(val?.rows?stageAccounts(val,w,i):"");
   }).join("");
  }
  function clearView(){
@@ -89,7 +98,7 @@
   snapshots.clear();
   for(const id of ["net","start","end"])all("ledger-"+id,"—");
   all("ledger-reconcile","");
-  if(changed){selected="day";daily=null;windows=[];stageRows=[];opts();clearView();all("ledger-stages","");all("ledger-time","正在核实链上区块…")}
+  if(changed){expandedStages.clear();selected="day";daily=null;windows=[];stageRows=[];opts();clearView();all("ledger-stages","");all("ledger-time","正在核实链上区块…")}
   all("ledger-stage-status","正在核对打局及归集记录…");
   try{
    const bounds=await api("/api/asset-windows?date="+date);

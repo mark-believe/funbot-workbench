@@ -63,8 +63,9 @@
 <section class="paper"><h2>本期福泽分布</h2><div id="ds-distribution"></div><p id="ds-period"></p></section></div></div>
  <div id="tab-assets" hidden><div class="desk-title"><h1>令牌中心</h1></div>
  <div class="asset-grid"><section class="paper asset-feature"><h2>主号福泽</h2><p>查看 42 枚令的每日资格、模拟费用和实际到账。</p><button id="assetDaily">查看福泽明细</button></section>
- <section class="paper"><h2>固定清单归集</h2><p>指定来源账号 → 主号 · 37 枚。执行前核对已完成进度。</p><button id="collect37">检查并归集剩余令牌</button></section></div>
- <details class="paper"><summary>单次操作 · 铸令与转移</summary><div class="ops"><button id="mintFour">主号铸 4 枚盟主令</button><button id="giftSelected">指定来源账号 转 指定令牌 给主号</button></div></details></div>
+ <section class="paper"><h2>归集到当前主号</h2><button id="collectionPreview">读取子账号持仓</button><p id="collectionStatus" role="status"></p><div id="collectionRows"></div><button id="collectionConfirm" hidden>确认归集清单</button></section></div>
+ <details class="paper"><summary>旧版专属清单操作</summary><p>仅供已配置固定来源地址和编号的专属构建使用。</p><section><h2>固定清单归集</h2><p>指定来源账号 → 主号 · 37 枚。执行前核对已完成进度。</p><button id="collect37">检查并归集剩余令牌</button></section>
+ <details class="paper"><summary>单次操作 · 铸令与转移</summary><div class="ops"><button id="mintFour">主号铸 4 枚盟主令</button><button id="giftSelected">指定来源账号 转 指定令牌 给主号</button></div></details></details></div>
  <div id="tab-play" hidden><div class="desk-title"><h1>日常打局</h1></div>
           <div id="playBlocked" class="big-hint" hidden></div><button id="playToSetup" hidden>打开账号设置</button>
 
@@ -580,6 +581,6 @@
       </form>
     </dialog>
     <div id="copyNotice" class="copy-notice" role="status" aria-live="polite" hidden></div>
-    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="asset-ledger.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script>
+    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="collection.js"></script><script src="asset-ledger.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script>
   </body>
 </html>
