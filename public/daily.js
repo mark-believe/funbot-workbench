@@ -42,7 +42,7 @@ async function loadDailyReport(){
   catch(e){clearDailyValues();put("df-status","暂时无法读取本地福泽报告，请点「刷新统计」重读。");}
   finally{dailyLoading=false;}
 }
-$("assetDaily").onclick=()=>{showTab("stats");$("daily-fuze").scrollIntoView({block:"center"});};
+$("assetDaily").onclick=()=>{showTab("stats");showReport("rewards");$("daily-fuze").scrollIntoView({block:"center"});};
 $("ds-refresh").addEventListener("click",loadDailyReport);
 document.querySelector('.tab[data-tab="stats"]').addEventListener("click",loadDailyReport);
 window.addEventListener("load",loadDailyReport);

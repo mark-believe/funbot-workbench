@@ -4,23 +4,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <title>共建工作台 · 武林大会</title>
+    <title>武林大会 · 共建平台</title>
     <link rel="icon" href="data:," />
-    <link rel="stylesheet" href="app.css" /><link rel="stylesheet" href="desk.css" /><link rel="stylesheet" href="workbench.css" /><link rel="stylesheet" href="overview.css" /><link rel="stylesheet" href="mark-ai.css" />
+    <link rel="stylesheet" href="app.css" /><link rel="stylesheet" href="desk.css" /><link rel="stylesheet" href="workbench.css" /><link rel="stylesheet" href="overview.css" /><link rel="stylesheet" href="mark-ai.css" /><link rel="stylesheet" href="operator.css" />
   </head>
   <body>
     <header>
       <div class="bar">
-        <div class="brand-lockup"><img class="brand-mark" src="mark-ai-symbol-dark.svg" alt="MARK·AI" /><div><strong class="brand">共建工作台</strong><small>MARK·AI / LOCAL OPERATOR</small></div></div><div class="tabs" aria-label="工作区">
+        <div class="brand-lockup"><img class="brand-mark" src="mark-ai-symbol-dark.svg" alt="MARK·AI" /><div><strong class="brand">武林大会 · 共建平台</strong><small>MARK·AI</small></div></div><div class="tabs" aria-label="工作区">
           <button class="tab on" data-tab="stats">总览</button>
           <button class="tab" data-tab="play">执行</button>
           <button class="tab" data-tab="assets">令牌</button>
           <button class="tab" data-tab="setup">账号与合约</button>
         </div>
+        <label class="environment-picker"><span>环境</span><select id="environment" aria-label="工作台环境"><option value="live">真实环境</option><option value="demo">测试数据</option></select></label>
+        <button type="button" id="vipOpen" class="vip-launch" aria-haspopup="dialog">社区 VIP</button>
+        <button type="button" data-modal="roadmapDialog" aria-haspopup="dialog">研发路线图</button>
         <span id="systemIdentity" class="chip">本地系统</span>
         <span id="net" class="chip">—</span>
         <span id="lockState" class="chip" role="status">连接中</span>
         <span id="block" class="chip">—</span>
+        <button type="button" data-modal="logDialog" class="log-launch">执行日志 <span id="logBadge">0</span></button>
         <span id="busy" class="chip warn" hidden>—</span>
         <button id="openUnlock" class="unlock-entry" type="button" aria-controls="secUnlock">解锁工作台</button>
       </div>
@@ -31,39 +35,41 @@
 
         <div id="tab-stats">
 
- <div class="desk-title"><div><h1>共建总览</h1><p id="ds-status" role="status">正在读取链上数据…</p></div><div class="overview-actions"><button data-tab-target="setup">账号与合约</button><button data-tab-target="play">进入执行台</button><button id="ds-refresh">刷新统计</button></div></div>
- <section class="paper asset-ledger" id="asset-ledger">
+ <div class="desk-title"><div><h1>操盘总览</h1><p id="ds-status" role="status">正在读取链上数据…</p></div><div class="overview-actions"><button data-tab-target="setup">账号与合约</button><button data-tab-target="play" class="daily-action">进入执行台 →</button><button id="ds-refresh">刷新统计</button></div></div>
+<nav class="report-nav" aria-label="总览报表"><button type="button" data-report="assets" aria-pressed="true">资产对账</button><button type="button" data-report="results" aria-pressed="false">战绩与扩组</button><button type="button" data-report="accounts" aria-pressed="false">账户明细</button><button type="button" data-report="rewards" aria-pressed="false">福泽记录</button></nav>
+ <section data-report-panel="assets" class="paper asset-ledger" id="asset-ledger">
   <div class="chart-head"><h2>可用资产变动 <small>fLGNS</small></h2><label class="date-filter">记账日 <input id="ledger-date" type="date"></label></div>
-  <div class="ledger-main"><div><span id="ledger-period">全队当日变动</span><strong id="ledger-net">—</strong></div><div><span id="ledger-start-label">日初可用</span><strong id="ledger-start">—</strong></div><div><span id="ledger-end-label">截至当前</span><strong id="ledger-end">—</strong></div></div>
-  <h3>逐组打完后的变化</h3><p id="ledger-stage-status" role="status"></p>
+  <div class="ledger-surface"><div class="ledger-main"><div><span id="ledger-period">全队当日变动</span><strong id="ledger-net">—</strong></div><div><span id="ledger-start-label">日初可用</span><strong id="ledger-start">—</strong></div><div><span id="ledger-end-label">截至当前</span><strong id="ledger-end">—</strong></div></div>
+  <section class="session-plot"><h3>各时段净变化 <small>fLGNS</small></h3><div id="sessionBars"></div></section></div>
+  <h3>各组打局前后</h3><p id="ledger-stage-status" role="status"></p>
   <div class="table-scroll"><table class="match-table"><thead><tr><th>打局 / 归集时段</th><th>打前全队可用</th><th>打后全队可用</th><th>本段变化</th><th>明细</th></tr></thead><tbody id="ledger-stages"></tbody></table></div>
-  <p id="ledger-reconcile" role="status"></p><div class="ledger-tools"><label>查看时段 <select id="ledger-window"><option value="day">北京时间全天</option></select></label><span id="ledger-time" role="status"></span></div>
+  <p id="ledger-reconcile" role="status"></p><details class="audit-extra"><summary>按时段核对分组余额和资产构成</summary><div class="ledger-tools"><label>查看时段 <select id="ledger-window"><option value="day">北京时间全天</option></select></label><span id="ledger-time" role="status"></span></div>
   <div class="table-scroll"><table class="match-table"><thead><tr><th>账号组</th><th>期初可用</th><th>期末可用</th><th>净变化</th><th>期末局内占用</th></tr></thead><tbody id="ledger-groups"></tbody></table></div>
   <details id="ledger-detail"><summary id="ledger-detail-title">逐账号资产明细</summary><div class="filters"><select id="ledger-group" aria-label="账号组"></select><input type="search" id="ledger-search" aria-label="搜索资产账号" placeholder="账号名称或地址"></div><div class="table-scroll ledger-scroll"><table class="match-table"><thead><tr><th>账号</th><th>期初可用</th><th>期末可用</th><th>净变化</th><th>钱包</th><th>擂台可取</th><th>可领甲子</th><th>可领师承</th><th>可领福泽</th><th>局内占用</th></tr></thead><tbody id="ledger-accounts"></tbody></table></div><small>右侧分项均为期末余额。悬停金额可看完整精度。</small></details>
-  <details><summary>金额怎么算</summary><p>可用资产 = 钱包 fLGNS + 已结算擂台余额 + 可领甲子 + 可领师承 + 本期可领福泽。局内押金单列。甲子未来额度、NFT 估值及 DAI Gas 均单独核算。净变化 = 期末可用 − 期初可用，包含外部转入转出。同一名册内归集时，转出和转入在全队合计中抵消。</p><p>全天按北京时间零点前最后一个区块起算。分组时段取主号 Squad 同组连续打局、归集的首笔前一区块和末笔所在区块；末笔仅入场时，押金仍可能占用。时段间的释放、转账也计入全天。各天均按当前名册比较。</p></details>
+  </details><details><summary>金额怎么算</summary><p>可用资产 = 钱包 fLGNS + 已结算擂台余额 + 可领甲子 + 可领师承 + 本期可领福泽。局内押金单列。甲子未来额度、NFT 估值及 DAI Gas 均单独核算。净变化 = 期末可用 − 期初可用，包含外部转入转出。同一名册内归集时，转出和转入在全队合计中抵消。</p><p>全天按北京时间零点前最后一个区块起算。分组时段取主号 Squad 同组连续打局、归集的首笔前一区块和末笔所在区块；末笔仅入场时，押金仍可能占用。时段间的释放、转账也计入全天。各天均按当前名册比较。</p></details>
  </section>
- <details><summary>自选区块核对</summary><section class="paper"><h2>可用资产变动 · fLGNS</h2>
+ <details data-report-panel="assets"><summary>自选区块核对</summary><section class="paper"><h2>可用资产变动 · fLGNS</h2>
 <form id="assetRange"><label>统计范围 <select id="assetMode"><option value="day">北京时间全天</option><option value="blocks">打局至归集</option></select></label>
 <input type="date" id="assetDay" aria-label="统计日期"><span id="assetBounds" hidden><input id="assetFirst" inputmode="numeric" placeholder="首笔交易区块" aria-label="首笔交易区块"><input id="assetLast" inputmode="numeric" placeholder="末笔交易区块" aria-label="末笔交易区块"></span> <button>查询变动</button></form>
 <p id="assetStatus" role="status">选择日期，或输入该组首末交易的区块号。</p><div id="assetRows"></div></section></details>
- <div id="ds-cards" class="metric-grid"></div>
- <div class="match-grid"><section class="paper group-report"><div class="chart-head"><h2>分组战绩</h2><label class="date-filter">比赛日 <input type="date" id="match-date"></label></div>
+ <div data-report-panel="results" hidden id="ds-cards" class="metric-grid"></div>
+ <div data-report-panel="results" hidden class="match-grid"><section class="paper group-report"><div class="chart-head"><h2>分组战绩</h2><label class="date-filter">比赛日 <input type="date" id="match-date"></label></div>
  <div class="table-scroll"><table class="match-table"><thead><tr><th>账号组</th><th>累计盟主</th><th>当日新增</th><th>参赛人次</th><th>待裁决</th><th>胜率</th></tr></thead><tbody id="match-groups"></tbody><tfoot id="match-total"></tfoot></table></div>
  <p class="match-note">按战绩时间归入北京时间自然日；累计截至所选日，胜率按已裁决人次计算。</p></section>
  <section class="paper trend"><div class="chart-head"><h2>近七日新增盟主</h2></div><div id="match-week"></div></section></div>
- <section class="paper expansion-report"><div class="chart-head"><h2>分组回本与扩组</h2><div class="book-tools"><button id="ex-read">重读核算表</button><button id="ex-open">打开核算表</button></div></div>
+ <section data-report-panel="results" hidden class="paper expansion-report"><div class="chart-head"><h2>分组回本与扩组</h2><div class="book-tools"><button id="ex-read">重读核算表</button><button id="ex-open">打开核算表</button></div></div>
 <p id="ex-note" role="status">正在核对甲子俸和资金记录…</p>
 <div class="table-scroll"><table class="match-table"><thead><tr><th>组别</th><th>累计 / 在产甲子</th><th>距 240 条</th><th>回本 / 扩组状态</th><th>尚差回本</th><th>首次确认 / 推算日</th><th>预留后余额</th><th>资金缺口</th><th>核算日</th></tr></thead><tbody id="ex-groups"></tbody></table></div>
 <details><summary>填写方法与计算依据</summary><p>打开独立 Excel，以 fLGNS 填每组的累计投入、累计已实现净收益、可调配余额、老组预留和新组预算。扣除费用，统一折算 Gas；共享主号余额只能归属一次。日期不同请追加一行，保存后点「重读核算表」。</p><p>净收益达到投入即回本；还需预留后余额够开一组，才显示「可开一组」。首次确认取最早达标的核算记录；未回本时，按同一投入下最近 7–30 天的净收益增速外推，仅供观察。在产指有效天数不足 60 天。240 条观察线按累计条数计算。</p></details></section>
- <section class="paper account-report"><div class="chart-head"><h2>账号明细</h2><span id="ds-count"></span></div><div class="filters"><input id="ds-search" type="search" placeholder="搜索账号、地址或 NFT 编号" aria-label="搜索账号、地址或 NFT 编号"><select id="ds-group" aria-label="选择账号组"><option value="">全部组</option></select><select id="ds-filter" aria-label="账号状态"><option value="">全部状态</option><option value="wins">当日获盟主</option><option value="mint">可铸令</option><option value="nft">持有 NFT</option><option value="claim">本期福泽可领</option></select></div>
- <div class="table-scroll"><table class="account-grid"><thead><tr><th>账号 / 地址</th><th>组别</th><th>累计盟主</th><th>当日新增</th><th>当日参赛</th><th>可铸令</th><th>NFT</th><th>可领福泽</th></tr></thead><tbody id="ds-rows"></tbody></table></div></section><div class="reward-grid"> <section id="daily-fuze" class="paper daily-panel"><div class="chart-head"><h2>主号每日福泽</h2><span class="read-mode">只读模拟</span></div>
+ <section data-report-panel="accounts" hidden class="paper account-report"><div class="chart-head"><h2>账号明细</h2><span id="ds-count"></span></div><div class="filters"><input id="ds-search" type="search" placeholder="搜索账号、地址或 NFT 编号" aria-label="搜索账号、地址或 NFT 编号"><select id="ds-group" aria-label="选择账号组"><option value="">全部组</option></select><select id="ds-filter" aria-label="账号状态"><option value="">全部状态</option><option value="wins">当日获盟主</option><option value="mint">可铸令</option><option value="nft">持有 NFT</option><option value="claim">本期福泽可领</option></select></div>
+ <div class="table-scroll"><table class="account-grid"><thead><tr><th>账号 / 地址</th><th>组别</th><th>累计盟主</th><th>当日新增</th><th>当日参赛</th><th>可铸令</th><th>NFT</th><th>可领福泽</th></tr></thead><tbody id="ds-rows"></tbody></table></div></section><div data-report-panel="rewards" hidden class="reward-grid"> <section id="daily-fuze" class="paper daily-panel"><div class="chart-head"><h2>主号每日福泽</h2><span class="read-mode">只读模拟</span></div>
  <p id="df-status" role="status">正在读取每日检查记录…</p>
  <p id="df-snapshot" hidden></p><div class="daily-metrics"><div>本次可领<strong id="df-amount">—</strong></div><div>模拟 Gas<strong id="df-gas">—</strong></div><div>累计实际到账<strong id="df-actual">—</strong></div><div>累计实际 Gas<strong id="df-paid">—</strong></div></div>
  <details><summary>查看范围与领取回执</summary><p id="df-scope"></p><div id="df-ledger"></div></details></section>
 <section class="paper"><h2>本期福泽分布</h2><div id="ds-distribution"></div><p id="ds-period"></p></section></div></div>
  <div id="tab-assets" hidden><div class="desk-title"><h1>令牌中心</h1></div>
- <div class="asset-grid"><section class="paper asset-feature"><h2>主号福泽</h2><p>查看 42 枚令的每日资格、模拟费用和实际到账。</p><button id="assetDaily">查看福泽明细</button></section>
- <section class="paper"><h2>归集到当前主号</h2><button id="collectionPreview">读取子账号持仓</button><p id="collectionStatus" role="status"></p><div id="collectionRows"></div><button id="collectionConfirm" hidden>确认归集清单</button></section></div>
+ <div class="asset-grid"><section class="paper asset-feature"><h2>主号福泽</h2><p>查看每日领取资格、模拟费用和实际到账。</p><button id="assetDaily">查看福泽明细</button></section>
+ <section class="paper"><h2>归集到当前主号</h2><p>按当前持仓预检来源、令牌编号和费用上限。</p><button id="collectionPreview" class="daily-action">预检归集清单 →</button></section></div>
  <details class="paper"><summary>旧版专属清单操作</summary><p>仅供已配置固定来源地址和编号的专属构建使用。</p><section><h2>固定清单归集</h2><p>指定来源账号 → 主号 · 37 枚。执行前核对已完成进度。</p><button id="collect37">检查并归集剩余令牌</button></section>
  <details class="paper"><summary>单次操作 · 铸令与转移</summary><div class="ops"><button id="mintFour">主号铸 4 枚盟主令</button><button id="giftSelected">指定来源账号 转 指定令牌 给主号</button></div></details></details></div>
  <div id="tab-play" hidden><div class="desk-title"><h1>日常打局</h1></div>
@@ -548,11 +554,11 @@
           </div>
         </div>
       </div>
-      <aside class="console" aria-label="执行日志">
+      <dialog class="operator-modal" id="logDialog" aria-label="执行日志"><div class="console">
         <div class="console-head">
           <span class="console-dot"></span>
           <h2>执行日志</h2>
-          <span class="console-tag">LIVE CONSOLE</span>
+          <button type="button" data-close-modal>关闭</button>
         </div>
         <div class="console-status">
           <span>&gt;_</span><span id="consoleStatus">等待连接本地程序…</span>
@@ -566,8 +572,47 @@
         <div class="console-foot">
           <span id="logCount">0 条记录</span><span>LOCAL SESSION</span>
         </div>
-      </aside>
+      </div></dialog>
     </main>
+    <dialog id="stageDialog" class="operator-modal" aria-labelledby="stageTitle"><div class="modal-head"><h2 id="stageTitle">账户变动</h2><button data-close-modal>关闭</button></div><p id="stageSummary"></p><div id="stageContents" class="modal-scroll"></div></dialog>
+    <dialog id="collectionDialog" class="operator-modal" aria-labelledby="collectionTitle"><div class="modal-head"><h2 id="collectionTitle">核对归集清单</h2><button data-close-modal>关闭</button></div><p id="collectionStatus" role="status"></p><div id="collectionRows" class="modal-scroll"></div><button id="collectionConfirm" class="daily-action" hidden>确认归集清单</button></dialog>
+    <dialog id="vipDialog" class="operator-modal" aria-labelledby="vipTitle">
+      <div class="modal-head"><h2 id="vipTitle">MARK·AI 社区 VIP</h2><button type="button" data-close-modal>关闭</button></div>
+      <form id="vipForm">
+        <label for="vipCode">输入授权码</label>
+        <p id="vipCodeHelp">完成交易后，向 Mark 领取授权码，再激活当前电脑。</p>
+        <div class="vip-code-row">
+          <input id="vipCode" type="password" required minlength="32" maxlength="32" autocomplete="off" spellcheck="false" placeholder="粘贴授权码" aria-describedby="vipCodeHelp">
+          <button id="vipSubmit" type="submit" class="vip-launch">激活本机</button>
+        </div>
+      </form>
+      <p id="vipStatus" role="status"></p>
+      <section class="vip-offer" aria-labelledby="vipOfferTitle">
+        <h3 id="vipOfferTitle">社区会员权益</h3>
+        <ul>
+          <li>基础 AI 教程</li>
+          <li>高级陪跑课程</li>
+          <li>Web3 + AI 应用技能</li>
+        </ul>
+        <p>社区 VIP 可永久使用「武林大会 · 共建平台」，软件与后续升级无需另付费。</p>
+      </section>
+      <section aria-labelledby="vipContactTitle">
+        <h3 id="vipContactTitle">扫码联系 Mark</h3>
+        <div class="vip-contacts">
+          <a href="wechat-contact.jpg" target="_blank" rel="noopener noreferrer"><span class="vip-qr vip-qr-wechat"><img src="wechat-contact.jpg" alt="Mark 的微信二维码"></span>微信</a>
+          <a href="debox-contact.jpg" target="_blank" rel="noopener noreferrer"><span class="vip-qr vip-qr-debox"><img src="debox-contact.jpg" alt="Mark 的 DeBox 二维码"></span>DeBox</a>
+        </div>
+      </section>
+    </dialog>
+    <dialog id="roadmapDialog" class="operator-modal" aria-labelledby="roadmapTitle">
+      <div class="modal-head"><h2 id="roadmapTitle">研发路线图</h2><button type="button" data-close-modal>关闭</button></div>
+      <p class="roadmap-note">以下功能正在规划，开放时间以版本公告为准。</p>
+      <ul class="roadmap-list">
+        <li><strong>固定价销毁债券抢购</strong><span>待研发</span></li>
+        <li><strong>AILGNS 抢购</strong><span>待研发</span></li>
+        <li><strong>P 链与 A 链债券一键领取</strong><span>待研发</span><p>计划覆盖日常 600、360 等债券。</p></li>
+      </ul>
+    </dialog>
     <dialog id="passwordDialog">
       <form method="dialog">
         <label id="passwordPrompt" for="deletePassword"
@@ -581,6 +626,6 @@
       </form>
     </dialog>
     <div id="copyNotice" class="copy-notice" role="status" aria-live="polite" hidden></div>
-    <script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="collection.js"></script><script src="asset-ledger.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script>
+    <script src="demo.js"></script><script src="app.js"></script><script src="dashboard.js"></script><script src="match-report.js"></script><script src="expansion.js"></script><script src="daily.js"></script><script src="collection.js"></script><script src="asset-ledger.js"></script><script src="asset-change.js"></script><script src="mark-ai.js"></script><script src="vip.js"></script>
   </body>
 </html>

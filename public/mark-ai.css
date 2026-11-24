@@ -176,3 +176,22 @@ dialog::backdrop { background: #030a13c9; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 .overview-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.bar .environment-picker{display:inline-flex;align-items:center;gap:.45rem;margin:0;color:var(--muted,#a5b8c5);font-size:.8rem;white-space:nowrap}
+.bar .environment-picker select{width:auto;min-height:32px;margin:0;padding:4px 8px;background:#142537;color:#e2edf4;border:1px solid #385568;border-radius:8px;font:inherit;cursor:pointer}
+body.demo-mode .environment-picker select{color:#ffdc89;border-color:#a57d32}
+@media(max-width:700px){.environment-picker span{display:none}}
+
+.report-nav { display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin:0 0 16px }
+.report-nav button { background:transparent;border:0;border-radius:0;color:var(--faint);min-height:44px;padding:8px 14px;border-bottom:3px solid transparent }
+.report-nav button[aria-pressed=true] { color:var(--ink);border-bottom-color:var(--jade);background:var(--panel-2) }
+#asset-ledger .ledger-main {background:#10293b;border:1px solid #29495f;border-radius:12px;padding:16px;gap:12px;margin:12px 0 24px}
+#asset-ledger .ledger-main strong {font-size:clamp(18px,2.2vw,32px);line-height:1.3}
+#asset-ledger .ledger-main .asset-up {color:#66dfb1}
+#asset-ledger .ledger-main .asset-down {color:#ffaaaa}
+#asset-ledger .stage-accounts {overflow:auto;max-height:360px;background:var(--panel-2);padding:8px}
+#asset-ledger .stage-accounts th small {display:block;color:var(--faint);font-weight:400}
+#asset-ledger .match-table td {font-variant-numeric:tabular-nums;text-align:right}
+#asset-ledger .stage-accounts thead th {position:sticky;top:0;background:var(--panel-2)}
+#tab-stats .account-report .table-scroll {max-height:64vh;overflow:auto}
+@media(max-width:620px){.report-nav button{flex:1;padding:6px 4px}.asset-ledger .ledger-main{grid-template-columns:1fr 1fr}.ledger-main>div:first-child{grid-column:1/-1}}

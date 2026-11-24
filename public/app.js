@@ -7,7 +7,7 @@ try {
   else TOKEN = sessionStorage.getItem("workbench.session") || "";
 } catch {}
 if (TOKEN && window.history.replaceState) {
-  window.history.replaceState(null, "", location.pathname);
+  window.history.replaceState(null, "", location.pathname + location.hash);
 }
 
 function wipeSecrets() {
@@ -18,6 +18,7 @@ function wipeSecrets() {
 }
 
 async function api(path, body) {
+  if (demoMode) return demoAPI(path, body);
   const r = await fetch(path, {
     method: body === undefined ? "GET" : "POST",
     headers: { "Content-Type": "application/json", "X-Token": TOKEN },
@@ -61,7 +62,7 @@ function setHTML(id, html) {
   return true;
 }
 
-function addressHTML(address, compact = false) {
+function addressHTML(address, compact = true) {
   if (!/^0x[0-9a-f]{40}$/i.test(address || "")) return esc(address || "—");
   return `<span class="address-copy"><span class="ad address-text" title="${esc(address)}">${esc(compact ? short(address) : address)}</span><button type="button" class="copy-address" data-copy-address="${esc(address)}" aria-label="复制完整地址 ${esc(address)}" title="复制完整地址"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></span>`;
 }
@@ -127,6 +128,8 @@ let sourceSignature = "";
 let logPaused = false;
 let logSignature = "";
 function renderLog() {
+  $("logBadge").textContent=String(V?.log?.length||0);
+  $("logBadge").classList.toggle("needs-attention",V?.log?.at(-1)?.kind==="bad");
   put(
     "consoleStatus",
     logPaused
@@ -325,7 +328,7 @@ function actionSelection(play = false) {
   return rows.map((r) => r.who);
 }
 
-let tab = "stats";
+let tab = ["stats","play","assets","setup"].includes(initialWorkbenchTab) ? initialWorkbenchTab : "stats";
 let unlockOrigin = null;
 
 function openUnlock() {
@@ -1188,3 +1191,9 @@ function askPassword(
 $("btnRecoverTransaction").addEventListener("click", (ev) =>
   act(ev.target, "/api/transaction/recover", {}),
 );
+
+document.addEventListener("click",event=>{
+ const launch=event.target.closest("[data-modal]");
+ if(launch)$(launch.dataset.modal).showModal();
+ if(event.target.closest("[data-close-modal]"))event.target.closest("dialog")?.close();
+});

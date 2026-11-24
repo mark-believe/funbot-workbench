@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -56,6 +57,8 @@ func (s *Server) Token() string { return s.token }
 
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("/api/vip", s.guard(s.handleVIP(false), false))
+	mux.HandleFunc("/api/vip/activate", s.guard(s.handleVIP(true), true))
 	mux.HandleFunc("/api/mandate/collection-plan", s.guard(s.previewCollection, false))
 	mux.HandleFunc("/api/mandate/collection-confirm", s.guard(s.confirmCollection, true))
 	mux.HandleFunc("/api/mandate/mint-four", s.guard(s.handleMandate(true), true))
@@ -723,7 +726,8 @@ func ListenAuto(addr string) (net.Listener, error) {
 }
 
 func isAddrInUse(err error) bool {
-	return errors.Is(err, syscall.EADDRINUSE) || containsFold(err.Error(), "address already in use")
+	// Winsock reports WSAEADDRINUSE (10048) on a port collision.
+	return (runtime.GOOS == "windows" && errors.Is(err, syscall.Errno(10048))) || errors.Is(err, syscall.EADDRINUSE) || containsFold(err.Error(), "address already in use")
 }
 
 func (s *Server) handleRecoverTransaction(w http.ResponseWriter, r *http.Request) {

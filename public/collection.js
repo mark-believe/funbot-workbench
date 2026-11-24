@@ -3,6 +3,7 @@
  const scan=$("collectionPreview"),send=$("collectionConfirm"),status=$("collectionStatus"),rows=$("collectionRows");
  let preview;
  scan.onclick=async()=>{
+  $("collectionDialog").showModal();
   preview=null;rows.replaceChildren();send.hidden=true;scan.disabled=true;
   status.textContent="正在同一区块核对本机名册内的令牌持仓…";
   try{
@@ -14,10 +15,10 @@
     if(!sources.has(item.Source))sources.set(item.Source,[]);
     sources.get(item.Source).push("#"+item.ID);
    }
-   status.textContent=sources.size+" 个来源账户，共 "+items.length+" 枚。目标主号 "+result.plan.Target+"。按 12 Gwei，每笔上限 120,000 Gas，合计费用上限 "+tokenAmount(result.maxFeeWei)+" DAI。";
-   const table=document.createElement("table");table.className="match-table";
+   status.innerHTML=sources.size+" 个来源账户，共 "+items.length+" 枚。目标主号 "+addressHTML(result.plan.Target)+"。按 12 Gwei，每笔上限 120,000 Gas，合计费用上限 "+tokenAmount(result.maxFeeWei)+" DAI。";
+   const table=document.createElement("table");table.className="match-table";table.innerHTML="<thead><tr><th>来源账户</th><th>数量</th><th>令牌编号</th></tr></thead>";const tbody=table.createTBody();
    for(const [address,ids] of sources){
-    const tr=table.insertRow();tr.insertCell().textContent=address;tr.insertCell().textContent=ids.length+" 枚";tr.insertCell().textContent=ids.join("、");
+    const tr=tbody.insertRow();tr.insertCell().innerHTML=addressHTML(address);tr.insertCell().textContent=ids.length+" 枚";tr.insertCell().textContent=ids.join("、");
    }
    rows.append(table);preview=result;send.hidden=false;
   }catch(e){status.textContent="预检未完成 · "+e.message}

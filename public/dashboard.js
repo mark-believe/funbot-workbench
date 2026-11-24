@@ -57,6 +57,13 @@ function renderAccounts(){
  return row;}).join("");
  setHTML("ds-rows",html||'<tr><td colspan="8">当前筛选没有匹配的账号</td></tr>');
 }
+function showReport(name){
+ for(const panel of document.querySelectorAll("[data-report-panel]"))panel.hidden=panel.dataset.reportPanel!==name;
+ for(const button of document.querySelectorAll("[data-report]"))button.setAttribute("aria-pressed",String(button.dataset.report===name));
+}
+document.querySelector(".report-nav").addEventListener("click",e=>{
+ const b=e.target.closest("[data-report]");if(b)showReport(b.dataset.report);
+});
 function resetPage(){expanded="";renderAccounts();document.querySelector(".account-report .table-scroll").scrollTop=0;}
 $("ds-refresh").onclick=()=>refreshDashboard(true);
 $("ds-search").oninput=resetPage;
@@ -67,7 +74,7 @@ $("tab-stats").addEventListener("click",e=>{
  if("group" in btn.dataset||"filter" in btn.dataset){
   if("group" in btn.dataset){$("ds-group").value=btn.dataset.group;$("ds-filter").value="";$("ds-search").value="";}
   if("filter" in btn.dataset){$("ds-filter").value=btn.dataset.filter;$("ds-group").value="";$("ds-search").value="";}
-  resetPage();$("ds-search").scrollIntoView({block:"center"});
+  showReport("accounts");resetPage();$("ds-search").scrollIntoView({block:"center"});
  }
 });
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>showTab(b.dataset.go));
