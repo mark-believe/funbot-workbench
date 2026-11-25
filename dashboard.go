@@ -203,7 +203,7 @@ func statsAt(ctx context.Context, c *Chain, sorted []VaultMeta, height, ts uint6
 						a.ActiveStipends++
 					}
 				}
-				if !nft && w[i+2].Cmp(big.NewInt(60)) == 0 && w[i+4].Cmp(big.NewInt(60)) == 0 {
+				if !nft && mandateMintEligible(w[i+2], w[i+4]) {
 					detail = append(detail, statCall{mandateContract, mandateData("used(address,uint256)", addr, token), func(v []*big.Int) error {
 						if len(v) != 1 || !v[0].IsUint64() || v[0].Uint64() > 1 || !token.Big().IsUint64() {
 							return errors.New("铸令资格无效")

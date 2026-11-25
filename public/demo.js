@@ -79,7 +79,9 @@ function createDemoAPI() {
         amount:wei(4),gas:68000,fee:"816000000000000",actualAmount:wei(12),actualGas:136000,actualFee:"1632000000000000",ledger:[]}};
       case "/api/mandate/collection-plan":{
         const items=accounts.slice(1).flatMap(a=>a.Tokens.map(t=>({Source:a.Address,ID:t.ID})));
-        return {plan:{Target:master,Items:items},approval:"demo",maxFeeWei:String(BigInt(items.length)*1440000000000000n)};
+        const mints=accounts.slice(1).flatMap(a=>a.Mint.map(index=>({Source:a.Address,Index:String(index)})));
+        const gas=BigInt(items.length+mints.length)*120000n+BigInt(mints.length)*877422n;
+        return {plan:{Target:master,Items:items,Mints:mints},approval:"demo",maxFeeWei:String(gas*12000000000n)};
       }
       case "/api/asset-windows":{
         const blocks=Array.from({length:5},(_,i)=>sheet(date,i).Block);

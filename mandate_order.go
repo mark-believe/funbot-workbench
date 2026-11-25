@@ -29,6 +29,9 @@ func mandateData(signature string, words ...common.Hash) []byte {
 	return data
 }
 func mandateInt(i uint64) common.Hash { return common.BigToHash(new(big.Int).SetUint64(i)) }
+func mandateMintEligible(age, claimed *big.Int) bool {
+	return age.IsUint64() && age.Uint64() == 60 && claimed.IsUint64() && claimed.Uint64() == 60
+}
 func (s *Server) mandateRead(ctx context.Context, block *big.Int, data []byte) ([]byte, error) {
 	var out []byte
 	err := s.chain.retry(ctx, func(ctx context.Context, c *ethclient.Client) error {
